@@ -1,94 +1,125 @@
-# 10x Astro Starter
+# SmartFlash
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+> Web application for fast, AI-powered creation and management of flashcards using spaced repetition.
+
+---
+
+## Table of Contents
+
+1. [Tech Stack](#tech-stack)  
+2. [Getting Started](#getting-started)  
+3. [Available Scripts](#available-scripts)  
+4. [Project Scope](#project-scope)  
+5. [Project Status](#project-status)  
+6. [License](#license)
+
+---
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+- **Frontend**  
+  - Astro 5  
+  - React 19  
+  - TypeScript 5  
+  - Tailwind 4  
+  - Shadcn/ui  
+- **Backend / BaaS**  
+  - Supabase (PostgreSQL, Auth, SDK)  
+- **AI Integration**  
+  - Openrouter.ai (multi-model gateway, cost limits)  
+- **CI/CD & Hosting**  
+  - GitHub Actions  
+  - DigitalOcean (Docker deployment)
 
-## Prerequisites
-
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+---
 
 ## Getting Started
 
-1. Clone the repository:
+### Prerequisites
+
+- **Node.js** v22.14.0 (use [nvm](https://github.com/nvm-sh/nvm))
+- A Supabase project and credentials
+- An Openrouter.ai API key
+
+### Environment Variables
+
+Create a `.env` file in the project root with the following variables:
 
 ```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+OPENROUTER_API_KEY=your_openrouter_api_key
 ```
 
-2. Install dependencies:
+### Setup & Run
 
 ```bash
+# Use Node version
+nvm use 22.14.0
+
+# Install dependencies
 npm install
-```
 
-3. Run the development server:
-
-```bash
+# Start development server
 npm run dev
-```
 
-4. Build for production:
-
-```bash
+# Build for production
 npm run build
+
+# Preview production build locally
+npm run preview
 ```
+
+---
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+All commands assume you’re in the project root:
 
-## Project Structure
-
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
+```bash
+npm run dev       # Start Astro dev server
+npm run build     # Build for production
+npm run preview   # Preview production build
+npm run astro     # Run Astro CLI
+npm run lint      # Run ESLint
+npm run lint:fix  # Run ESLint with auto-fix
+npm run format    # Format code with Prettier
 ```
 
-## AI Development Support
+---
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+## Project Scope
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
+### In-Scope Features
 
-### Cursor IDE
+- AI-powered flashcard candidate generation (1000–10000 chars, <30s)  
+- Candidate review: accept, edit, or reject before saving  
+- Manual flashcard CRUD (front ≤200 chars, back ≤500 chars)  
+- Flashcard listing with search & pagination (20 items/page)  
+- User account management (register, email verify, login, password reset, delete)  
+- Row-level security: users only access their own flashcards  
+- Spaced repetition session view using external algorithm  
+- Event logging & metrics (generation count, acceptance rate)
 
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
+### Out-of-Scope (MVP)
 
-### GitHub Copilot
+- No custom spaced-repetition engine (uses external)  
+- No importing from PDF, DOCX, etc.  
+- No sharing of flashcard sets between users  
+- No integration with other educational platforms  
+- No mobile application  
+- Initial MVP does not include CI/CD pipelines
 
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
+---
 
-### Windsurf
+## Project Status
 
-The `.windsurfrules` file contains AI configuration for Windsurf.
+**Status**: MVP / Active Development  
+The core flashcard generation and management flows are under active development, with continuous improvements planned for user experience and scaling.
 
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+---
 
 ## License
 
-MIT
+> **TBD** – license to be defined.  
+Please add a `LICENSE` file or update the `license` field in `package.json`.
