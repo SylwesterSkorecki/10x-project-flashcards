@@ -2,6 +2,16 @@
 
 1. Tables
 
+## users
+This table is manage by Supabase Auth.
+
+Columns:
+- **id**: UUID PRIMARY KEY
+- **email**: VARCHAR(255) NOT NULL UNIQUE
+- **encrypted_password**: VARCHAR NOT NULL
+- **create_at**: TIMESTAMPTZ NOT NULL DEFAULT now()
+- **confirmed_at**: TIMESTAMPTZ
+
 ## flashcards
 
 Columns:
@@ -54,13 +64,10 @@ Columns:
 
 3. Indexes
 
-- **flashcards**: 
-  - B-tree on (user_id, created_at DESC)
-  - GIN on (front gin_trgm_ops)
-- **generations**: B-tree on (user_id, created_at DESC)
-- **generation_error_logs**:
-  - B-tree on (generation_id)
-  - B-tree on (user_id, created_at DESC)
+- indeks na kolumnie `user_id` w tabeli flashcards
+- indeks na kolumnie `generation_id` w tabeli flashcards
+- indeks na kolumnie `user_id` w tabeli generations 
+- indeks na kolumnie `user_id` w tabeli generation_error_logs
 
 4. RLS Policies
 
