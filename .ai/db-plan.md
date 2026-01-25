@@ -3,9 +3,11 @@
 1. Tables
 
 ## users
+
 This table is manage by Supabase Auth.
 
 Columns:
+
 - **id**: UUID PRIMARY KEY
 - **email**: VARCHAR(255) NOT NULL UNIQUE
 - **encrypted_password**: VARCHAR NOT NULL
@@ -15,6 +17,7 @@ Columns:
 ## flashcards
 
 Columns:
+
 - **id**: UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **user_id**: UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE
 - **generation_id**: UUID REFERENCES generations(id) ON DELETE SET NULL
@@ -25,11 +28,13 @@ Columns:
 - **updated_at**: TIMESTAMPTZ NOT NULL DEFAULT now()
 
 Constraints:
+
 - UNIQUE (user_id, front)
 
 ## generations
 
 Columns:
+
 - **id**: UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **user_id**: UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE
 - **model**: VARCHAR NOT NULL
@@ -45,6 +50,7 @@ Columns:
 ## generation_error_logs
 
 Columns:
+
 - **id**: UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **user_id**: UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE
 - **model**: VARCHAR NOT NULL
@@ -66,7 +72,7 @@ Columns:
 
 - indeks na kolumnie `user_id` w tabeli flashcards
 - indeks na kolumnie `generation_id` w tabeli flashcards
-- indeks na kolumnie `user_id` w tabeli generations 
+- indeks na kolumnie `user_id` w tabeli generations
 - indeks na kolumnie `user_id` w tabeli generation_error_logs
 
 4. RLS Policies
@@ -74,14 +80,17 @@ Columns:
 Enable Row-Level Security on each table:
 
 ### flashcards
+
 - **SELECT/UPDATE/DELETE**: USING (user_id = auth.uid())
 - **INSERT**: WITH CHECK (user_id = auth.uid())
 
 ### generations
+
 - **SELECT/UPDATE/DELETE**: USING (user_id = auth.uid())
 - **INSERT**: WITH CHECK (user_id = auth.uid())
 
 ### generation_error_logs
+
 - **SELECT/UPDATE/DELETE**: USING (user_id = auth.uid())
 - **INSERT**: WITH CHECK (user_id = auth.uid())
 

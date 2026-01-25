@@ -1,11 +1,15 @@
 # Dokument wymagań produktu (PRD) - SmartFlash
+
 ## 1. Przegląd produktu
+
 SmartFlash to aplikacja webowa umożliwiająca szybkie tworzenie wysokiej jakości fiszek edukacyjnych z wykorzystaniem AI. Użytkownik może generować kandydatów na fiszki na podstawie wprowadzonego tekstu (0–10000 znaków) oraz ręcznie dodawać własne fiszki. System zapewnia funkcje CRUD dla fiszek, prosty system kont użytkowników oraz integrację z gotowym algorytmem spaced repetition.
 
 ## 2. Problem użytkownika
+
 Manualne tworzenie fiszek jest czasochłonne i monotonny proces, co prowadzi do niskiego zaangażowania i rzadkiego stosowania metody spaced repetition. Użytkownicy potrzebują wygodnego mechanizmu szybkiego generowania i zarządzania fiszkami.
 
 ## 3. Wymagania funkcjonalne
+
 - generowanie kandydatów na fiszki przez AI na podstawie wprowadzonego tekstu (limit 0–10000 znaków), SLA < 30 s
 - recenzja kandydatów: akceptacja, edycja lub odrzucenie; zaakceptowane zapisują się w bazie
 - ręczne dodawanie fiszek (pole front ("przód") ≤ 200 znaków, pole back (tył) ≤ 500 znaków)
@@ -20,10 +24,11 @@ Manualne tworzenie fiszek jest czasochłonne i monotonny proces, co prowadzi do 
 - przechowywanie i skalowalność: dane o fiszkach i użytkwonikach przechowywane w sposób zapewniający skalowalność i bezpieczeństwo,
 - Statystyki generowania fiszek: zbieranie informacji o tym, ile fiszek zostało wygenerowanych przez AI i ile z nich ostatecznie zaakceptowano,
 - wymagania prawne i ograniczenia:
-    - dane osobowe użytkowników i fiszek przechowywane zgodnie z RODO,
-    - prawo do wglądu i usunięcia dancyh (konto warz z fiszkami) na wniosek użytkownika
+  - dane osobowe użytkowników i fiszek przechowywane zgodnie z RODO,
+  - prawo do wglądu i usunięcia dancyh (konto warz z fiszkami) na wniosek użytkownika
 
 ## 4. Granice produktu
+
 - brak własnego algorytmu spaced repetition (korzystanie z istniejącego)
 - brak importu wielu formatów (PDF, DOCX itp.)
 - brak współdzielenia zestawów między użytkownikami
@@ -32,6 +37,7 @@ Manualne tworzenie fiszek jest czasochłonne i monotonny proces, co prowadzi do 
 - brak CI/CD w MVP
 
 ## 5. Historyjki użytkowników
+
 - ID: US-001
   tytuł: Generowanie kandydatów na fiszki
   opis: jako student chcę wkleić tekst (1000–10000 znaków) i uruchomić generowanie, by otrzymać propozycje fiszek przed zapisaniem
@@ -155,8 +161,9 @@ Manualne tworzenie fiszek jest czasochłonne i monotonny proces, co prowadzi do 
   - Następnie algorytm pokazuje kolejną fiszkę w ramach sesji nauki
 
 ## 6. Metryki sukcesu
+
 1. Efektywność generowania fiszek:
-    - 75% wygenerowanych przez AI fiszek jest akceptowanych przez użytkownika.
-    - Użytkownicy tworzą co najmniej 75% fiszek z wykorzystaniem AI (w stosunku do wszystkich nowo dodanych fiszek)
+   - 75% wygenerowanych przez AI fiszek jest akceptowanych przez użytkownika.
+   - Użytkownicy tworzą co najmniej 75% fiszek z wykorzystaniem AI (w stosunku do wszystkich nowo dodanych fiszek)
 2. Zaangażowanie:
-    - Monitorowanie liczby wygenerowanych fiszek i porównanie z liczbą zatwierdzonych do analizy jakości i użyteczności
+   - Monitorowanie liczby wygenerowanych fiszek i porównanie z liczbą zatwierdzonych do analizy jakości i użyteczności

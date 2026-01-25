@@ -6,29 +6,29 @@
 
 ## Table of Contents
 
-1. [Tech Stack](#tech-stack)  
-2. [Getting Started](#getting-started)  
-3. [Available Scripts](#available-scripts)  
-4. [Project Scope](#project-scope)  
-5. [Project Status](#project-status)  
+1. [Tech Stack](#tech-stack)
+2. [Getting Started](#getting-started)
+3. [Available Scripts](#available-scripts)
+4. [Project Scope](#project-scope)
+5. [Project Status](#project-status)
 6. [License](#license)
 
 ---
 
 ## Tech Stack
 
-- **Frontend**  
-  - Astro 5  
-  - React 19  
-  - TypeScript 5  
-  - Tailwind 4  
-  - Shadcn/ui  
-- **Backend / BaaS**  
-  - Supabase (PostgreSQL, Auth, SDK)  
-- **AI Integration**  
-  - Openrouter.ai (multi-model gateway, cost limits)  
-- **CI/CD & Hosting**  
-  - GitHub Actions  
+- **Frontend**
+  - Astro 5
+  - React 19
+  - TypeScript 5
+  - Tailwind 4
+  - Shadcn/ui
+- **Backend / BaaS**
+  - Supabase (PostgreSQL, Auth, SDK)
+- **AI Integration**
+  - Openrouter.ai (multi-model gateway, cost limits)
+- **CI/CD & Hosting**
+  - GitHub Actions
   - DigitalOcean (Docker deployment)
 
 ---
@@ -92,22 +92,22 @@ npm run format    # Format code with Prettier
 
 ### In-Scope Features
 
-- AI-powered flashcard candidate generation (1000–10000 chars, <30s)  
-- Candidate review: accept, edit, or reject before saving  
-- Manual flashcard CRUD (front ≤200 chars, back ≤500 chars)  
-- Flashcard listing with search & pagination (20 items/page)  
-- User account management (register, email verify, login, password reset, delete)  
-- Row-level security: users only access their own flashcards  
-- Spaced repetition session view using external algorithm  
+- AI-powered flashcard candidate generation (1000–10000 chars, <30s)
+- Candidate review: accept, edit, or reject before saving
+- Manual flashcard CRUD (front ≤200 chars, back ≤500 chars)
+- Flashcard listing with search & pagination (20 items/page)
+- User account management (register, email verify, login, password reset, delete)
+- Row-level security: users only access their own flashcards
+- Spaced repetition session view using external algorithm
 - Event logging & metrics (generation count, acceptance rate)
 
 ### Out-of-Scope (MVP)
 
-- No custom spaced-repetition engine (uses external)  
-- No importing from PDF, DOCX, etc.  
-- No sharing of flashcard sets between users  
-- No integration with other educational platforms  
-- No mobile application  
+- No custom spaced-repetition engine (uses external)
+- No importing from PDF, DOCX, etc.
+- No sharing of flashcard sets between users
+- No integration with other educational platforms
+- No mobile application
 - Initial MVP does not include CI/CD pipelines
 
 ---
@@ -122,4 +122,4 @@ The core flashcard generation and management flows are under active development,
 ## License
 
 > **TBD** – license to be defined.  
-Please add a `LICENSE` file or update the `license` field in `package.json`.
+> Please add a `LICENSE` file or update the `license` field in `package.json`.
