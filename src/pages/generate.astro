@@ -1,0 +1,21 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { GeneratePage } from "@/components/generate";
+
+// Auth guard - check if user is authenticated
+// TODO: Uncomment when auth/login page is implemented
+// const supabase = Astro.locals.supabase;
+// const {
+//   data: { user },
+// } = await supabase.auth.getUser();
+
+// if (!user) {
+//   // Redirect to login with returnTo parameter
+//   const returnTo = encodeURIComponent("/generate");
+//   return Astro.redirect(`/auth/login?returnTo=${returnTo}`);
+// }
+---
+
+<Layout title="Generate Flashcards">
+  <GeneratePage client:load />
+</Layout>
