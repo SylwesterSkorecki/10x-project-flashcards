@@ -5,7 +5,8 @@ export type ApiErrorCode =
   | "not_found"
   | "duplicate_front"
   | "duplicate_source"
-  | "internal_error";
+  | "internal_error"
+  | "not_implemented";
 
 export function createErrorResponse(
   code: ApiErrorCode | string,

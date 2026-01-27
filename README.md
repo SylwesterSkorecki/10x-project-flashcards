@@ -46,10 +46,21 @@
 Create a `.env` file in the project root with the following variables:
 
 ```bash
+# Supabase Configuration
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
+
+# OpenRouter Configuration (AI Service)
 OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1  # Optional, defaults to this value
+OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional, defaults to this model
 ```
+
+**Security Notes:**
+- Never commit `.env` files to version control
+- Store production API keys in Supabase Secrets or a secure Secrets Manager
+- Rotate API keys periodically for enhanced security
+- Use environment-specific keys (development, staging, production)
 
 ### Setup & Run
 
