@@ -1,0 +1,94 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+
+// TODO: Implement email verification logic
+// const supabase = Astro.locals.supabase;
+// const { data: { user }, error } = await supabase.auth.getUser();
+
+// Mock status for UI demonstration
+let status: "success" | "error" | "already_verified" = "success";
+let message = "Twój email został zweryfikowany! Możesz się teraz zalogować.";
+
+// TODO: Uncomment when Supabase is integrated
+// if (error) {
+//   status = 'error';
+//   message = 'Link weryfikacyjny jest nieprawidłowy lub wygasł.';
+// } else if (user?.email_confirmed_at) {
+//   status = 'already_verified';
+//   message = 'Twój email został już wcześniej zweryfikowany.';
+// }
+
+const redirectUrl =
+  status === "success"
+    ? "/auth/login?message=email_verified"
+    : "/auth/login";
+---
+
+<Layout title="Weryfikacja emaila - SmartFlash">
+  <div class="min-h-screen flex items-center justify-center bg-muted/30 py-12 px-4">
+    <div class="w-full max-w-md mx-auto p-6 space-y-6 bg-background rounded-lg border shadow-sm">
+      {
+        status === "success" && (
+          <div class="text-center space-y-4">
+            <div class="flex justify-center">
+              <CheckCircle2 className="size-16 text-green-500" />
+            </div>
+            <div class="space-y-2">
+              <h1 class="text-2xl font-bold">Email zweryfikowany!</h1>
+              <p class="text-muted-foreground">{message}</p>
+              <p class="text-sm text-muted-foreground">
+                Przekierowujemy Cię do strony logowania...
+              </p>
+            </div>
+          </div>
+        )
+      }
+
+      {
+        status === "already_verified" && (
+          <div class="text-center space-y-4">
+            <div class="flex justify-center">
+              <AlertCircle className="size-16 text-primary" />
+            </div>
+            <div class="space-y-2">
+              <h1 class="text-2xl font-bold">Email już zweryfikowany</h1>
+              <p class="text-muted-foreground">{message}</p>
+            </div>
+            <Button asChild className="mt-4">
+              <a href="/auth/login">Przejdź do logowania</a>
+            </Button>
+          </div>
+        )
+      }
+
+      {
+        status === "error" && (
+          <div class="text-center space-y-4">
+            <div class="flex justify-center">
+              <XCircle className="size-16 text-destructive" />
+            </div>
+            <div class="space-y-2">
+              <h1 class="text-2xl font-bold">Błąd weryfikacji</h1>
+              <p class="text-muted-foreground">{message}</p>
+            </div>
+            <Button asChild className="mt-4">
+              <a href="/auth/register">Zarejestruj się ponownie</a>
+            </Button>
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    status === "success" && (
+      <script define:vars={{ redirectUrl }}>
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 3000);
+      </script>
+    )
+  }
+</Layout>
