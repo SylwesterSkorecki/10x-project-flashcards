@@ -5,6 +5,7 @@
 SmartFlash to webowy interfejs (Astro + React) z responsywnym topbarem (shadcn/ui) i klient‑side routingiem. UI obsługuje CRUD fiszek, asynchroniczne/synchroniczne generowanie AI z przeglądem kandydatów, sesje nauki (spaced repetition) oraz widok statystyk. Stan globalny: React Context (auth, UI flags, modal manager), TanStack Query dla fetch/cache/polling/retries i optimistic updates. Wszystkie operacje API wymagają autoryzacji (JWT/Supabase).
 
 Kluczowe zasady:
+
 - Mobile‑first, WCAG AA (focus management, aria, keyboard)
 - Bezpieczeństwo: nie ujawniać danych innych użytkowników, obsługa 401/403, re‑auth przy operacjach krytycznych
 - Dobre UX dla generowania AI: widoczny status, polling z exponential backoff, możliwość anulowania, jasne raporty saved/skipped
@@ -18,7 +19,7 @@ Poniżej każdy widok z celem, kluczowymi informacjami i komponentami.
   - Główny cel: Umożliwienie użytkownikowi logowania i rejestracji
   - Kluczowe informacje: Formularze z polami e-mail i hasło; wiadomości o błędach uwierzytelniania
   - Kluczowe komponenty: Formularz logowania/rejestracji, komponent walidacji, przyciski, komunikaty błędów
-  UX, dostępność i względy bezpieczeństwa: Prosty formularz, czytelne komunikaty błędów, obsługa klawiatury, zabezpieczenia JWT
+    UX, dostępność i względy bezpieczeństwa: Prosty formularz, czytelne komunikaty błędów, obsługa klawiatury, zabezpieczenia JWT
 
 - Nazwa widoku: Lista fiszek
   - Ścieżka: `/flashcards`
@@ -127,6 +128,7 @@ Poniżej każdy widok z celem, kluczowymi informacjami i komponentami.
 Główny przypadek użycia: Generowanie i zapis fiszek
 
 Kroki:
+
 1. Użytkownik loguje się (/auth/login) — po sukcesie redirect → /dashboard
 2. Użytkownik wybiera „Generuj” w topbar lub przechodzi na `/generate`
 3. Wkleja `source_text`, widzi licznik znaków; kiedy gotowy klika „Generuj”
@@ -140,6 +142,7 @@ Kroki:
 9. Użytkownik może rozpocząć sesję nauki z zapisanych fiszek (/study)
 
 Inne podróże:
+
 - CRUD bez generowania: Flashcards → Edit modal → PUT /api/flashcards/{id}
 - Usuwanie: Flashcards → Delete confirmation → DELETE /api/flashcards/{id}
 - Auth flows: signup → email verification → login
@@ -147,6 +150,7 @@ Inne podróże:
 ## 4. Układ i struktura nawigacji
 
 Zasady:
+
 - Topbar (shadcn/ui Navigation menu) jako globalny element z primary action „Generuj” widocznym i zawsze dostępnym.
 - Desktop: horizontal topbar z logo (lewo), nav links (Flashcards, Generate, Study, Stats, Account), primary CTA „Generuj” (prawo), user avatar menu (profile, logout).
 - Mobile: hamburger menu, primary CTA jako przycisk w topbar lub sticky FAB; nav items w slide‑over panel.
@@ -154,6 +158,7 @@ Zasady:
 - Stan filtrów/paginacji/search w URL, umożliwiający deeplinkowanie i back/forward.
 
 Mapowanie elementów do routingu:
+
 - `/` → redirect → `/flashcards`
 - `/flashcards` → lista fiszek
 - `/generate` → generator + review
@@ -163,6 +168,7 @@ Mapowanie elementów do routingu:
 - `/account` → ustawienia konta
 
 Bezpieczeństwo nawigacji:
+
 - Chronione trasy → wymagają auth; guardy routingowe redirect do /auth/login z returnTo
 - Przy wrażliwych akcjach (delete account) pop‑up re‑auth
 
@@ -205,6 +211,7 @@ Lista komponentów wielokrotnego użytku i ich rola:
   - handles per‑card reveal, key bindings, progress persistence
 
 Dodatkowe uwagi UX / accessibility / security:
+
 - Wszystkie akcje mutujące (DELETE, PUT, POST commit) powinny mieć optimistic UI lub potwierdzenia i obsługę rollback w przypadku błędu.
 - Mapowanie kodów błędów API do UI (duplicate_front → per‑field hint; 503 → retry modal).
 - Implementować interceptory fetch/axios do automatycznej obsługi 401 (silent refresh lub redirect) i globalnego logowania błędów.
@@ -255,7 +262,6 @@ Dodatkowe uwagi UX / accessibility / security:
 - Ból: Ograniczenia użycia (koszty/rate) → rozwiązanie: cooldown UI, informacja o limitach, disable CTA przy cooldown
 - Ból: Accessibility (keyboard/screen reader) → rozwiązanie: keyboard-first controls, aria-live, trap focus w modalach
 
---- 
+---
 
 Dokument przygotowany jako plan architektury UI; plik ma służyć jako punkt odniesienia dla implementacji komponentów i routingu.
-

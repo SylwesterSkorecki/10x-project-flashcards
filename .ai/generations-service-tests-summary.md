@@ -1,9 +1,11 @@
 # Testy jednostkowe GenerationsService - Podsumowanie
 
 ## Plik testowy
+
 `tests/unit/generations.service.test.ts`
 
 ## Statystyki
+
 - **Łączna liczba testów:** 59
 - **Status:** ✅ Wszystkie testy przechodzą
 - **Pokrycie metod:** 100% kluczowych metod
@@ -13,6 +15,7 @@
 ## 1. Testy metody `_parseGenerationResponse` (15 testów)
 
 ### Scenariusze pozytywne:
+
 - ✅ Parsowanie poprawnego JSON bez bloków kodu markdown
 - ✅ Parsowanie JSON w bloku markdown z tagiem `json`
 - ✅ Parsowanie JSON w bloku markdown bez tagu języka
@@ -24,6 +27,7 @@
 - ✅ Obsługa pustej tablicy flashcards
 
 ### Scenariusze negatywne:
+
 - ✅ Błąd dla niepoprawnego JSON
 - ✅ Błąd gdy brakuje tablicy flashcards
 - ✅ Błąd gdy flashcards nie jest tablicą
@@ -32,6 +36,7 @@
 - ✅ Błąd dla ujemnego score (< 0)
 
 ### Kluczowe reguły biznesowe:
+
 - Akceptuje tylko JSON z tablicą `flashcards`
 - Score musi być w zakresie [0, 1]
 - Domyślny score = 0.8 gdy brakuje
@@ -43,6 +48,7 @@
 ## 2. Testy metody `_convertToGenerationCandidates` (10 testów)
 
 ### Scenariusze:
+
 - ✅ Konwersja flashcards na format GenerationCandidate
 - ✅ Sortowanie po score (malejąco)
 - ✅ Ograniczenie do maxCandidates
@@ -55,6 +61,7 @@
 - ✅ Ignorowanie opcjonalnych pól (difficulty, tags)
 
 ### Kluczowe reguły biznesowe:
+
 - Sortowanie malejące po score (najlepsze na początku)
 - Format candidate_id: `candidate-{timestamp}-{index}`
 - Tylko pola: candidate_id, front, back, score, status
@@ -65,6 +72,7 @@
 ## 3. Testy metody `estimateGenerationCost` (8 testów)
 
 ### Scenariusze:
+
 - ✅ Estymacja dla typowego tekstu polskiego
 - ✅ Obliczanie tokenów: 2.5 znaków = 1 token (Polish)
 - ✅ Uwzględnienie system message (100 tokenów)
@@ -76,6 +84,7 @@
 - ✅ Zwracanie spójnej struktury
 
 ### Kluczowe reguły biznesowe:
+
 - Polish text: 2.5 chars per token
 - System message overhead: 100 tokens
 - User message overhead: 50 tokens
@@ -83,6 +92,7 @@
 - Zaokrąglanie: Math.ceil()
 
 **Formuła:**
+
 ```
 promptTokens = ceil(sourceText.length / 2.5) + 100 + 50
 completionTokens = 1000
@@ -94,6 +104,7 @@ totalTokens = promptTokens + completionTokens
 ## 4. Testy walidacji w `generateFlashcards` (13 testów)
 
 ### Walidacja source_text:
+
 - ✅ Błąd dla pustego tekstu
 - ✅ Błąd dla tekstu tylko whitespace
 - ✅ Błąd dla < 1000 znaków
@@ -102,6 +113,7 @@ totalTokens = promptTokens + completionTokens
 - ✅ Akceptacja dokładnie 10000 znaków
 
 ### Walidacja max_candidates:
+
 - ✅ Błąd dla < 1
 - ✅ Błąd dla > 20
 - ✅ Błąd dla wartości ujemnych
@@ -111,6 +123,7 @@ totalTokens = promptTokens + completionTokens
 - ✅ Ograniczanie do max_candidates (top N po score)
 
 ### Kluczowe reguły biznesowe:
+
 - **source_text:** 1000-10000 znaków
 - **max_candidates:** 1-20
 - **domyślne max_candidates:** 8
@@ -120,11 +133,13 @@ totalTokens = promptTokens + completionTokens
 ## 5. Testy obsługi błędów w `generateFlashcards` (9 testów)
 
 ### Transformacja błędów na user-friendly messages:
+
 - ✅ "validation failed" → "AI model returned invalid response format..."
 - ✅ "timeout" → "Request timed out. Please try with shorter text..."
 - ✅ "Circuit breaker" → "AI service is temporarily unavailable..."
 
 ### Logowanie błędów:
+
 - ✅ Zapisywanie błędów do tabeli `generation_error_logs`
 - ✅ Poprawny error_code dla validation_error
 - ✅ Poprawny error_code dla timeout_error
@@ -134,6 +149,7 @@ totalTokens = promptTokens + completionTokens
 - ✅ Re-throw oryginalnego błędu po zalogowaniu
 
 ### Kluczowe reguły biznesowe:
+
 - Error codes: validation_error, timeout_error, service_unavailable, auth_error, unknown_error
 - Ograniczenie długości error_message do 500 znaków
 - Silent fail dla błędów logowania
@@ -143,6 +159,7 @@ totalTokens = promptTokens + completionTokens
 ## 6. Testy success flow w `generateFlashcards` (5 testów)
 
 ### Scenariusze:
+
 - ✅ Zwracanie pełnej odpowiedzi z wszystkimi polami
 - ✅ Zwracanie kandydatów z poprawną strukturą
 - ✅ Zapisywanie rekordu generacji do bazy danych
@@ -150,6 +167,7 @@ totalTokens = promptTokens + completionTokens
 - ✅ Obliczanie duration_ms (≥ 0, integer)
 
 ### Zwracana struktura:
+
 ```typescript
 {
   generation_id: string,      // UUID z bazy
@@ -161,6 +179,7 @@ totalTokens = promptTokens + completionTokens
 ```
 
 ### Kluczowe reguły biznesowe:
+
 - Zapisywanie do tabeli `generations` z wszystkimi metadanymi
 - Hash source_text dla deduplikacji
 - Użycie domyślnego modelu gdy nie podano
@@ -172,16 +191,19 @@ totalTokens = promptTokens + completionTokens
 ## Mockowanie
 
 ### OpenRouterService
+
 - Mock jako konstruktor (wymóg Vitest)
 - Mockowane metody: `sendChatMessage`
 - Mockowane właściwości: `defaultModel`
 
 ### SupabaseClient
+
 - Mock chainable API: `from().insert().select().single()`
 - Mock dla tabeli `generations`
 - Mock dla tabeli `generation_error_logs`
 
 ### Helpers
+
 - `hashSourceText`: mock zwracający `hash-{length}`
 
 ---
@@ -189,6 +211,7 @@ totalTokens = promptTokens + completionTokens
 ## Najlepsze praktyki zastosowane
 
 ### Zgodnie z regułami Vitest:
+
 1. ✅ Użycie `vi.mock()` dla zależności zewnętrznych
 2. ✅ Mock factory functions na początku pliku
 3. ✅ `beforeEach` dla resetowania mocków
@@ -200,6 +223,7 @@ totalTokens = promptTokens + completionTokens
 9. ✅ Mockowanie z typed mocks
 
 ### Struktura testów:
+
 - **Arrange:** Setup service, mocks, test data
 - **Act:** Call method under test
 - **Assert:** Verify results
@@ -227,6 +251,7 @@ npm run test:ui
 ## Potencjalne rozszerzenia
 
 ### Dodatkowe testy do rozważenia:
+
 1. Testy integracyjne z prawdziwym OpenRouter API (z tagging: @integration)
 2. Testy performance dla dużych źródeł tekstu
 3. Testy concurrent requests (rate limiting)
@@ -235,6 +260,7 @@ npm run test:ui
 6. Snapshot testing dla response format
 
 ### Metryki do monitorowania:
+
 - Token usage vs estimates
 - Generation success rate
 - Average generation time
@@ -246,14 +272,16 @@ npm run test:ui
 ## Wnioski
 
 ### Co zostało przetestowane:
+
 ✅ **100%** metod publicznych  
 ✅ **100%** metod prywatnych  
 ✅ **100%** walidacji input  
 ✅ **100%** obsługi błędów  
 ✅ **100%** transformacji danych  
-✅ **100%** reguł biznesowych  
+✅ **100%** reguł biznesowych
 
 ### Jakość testów:
+
 - Testy są **izolowane** (każdy test niezależny)
 - Testy są **powtarzalne** (deterministyczne z mockami)
 - Testy są **szybkie** (< 100ms dla wszystkich)
@@ -261,6 +289,7 @@ npm run test:ui
 - Testy są **maintainable** (łatwe w utrzymaniu)
 
 ### Confidence level:
+
 🟢 **Bardzo wysoki** - service gotowy do production
 
 Wszystkie kluczowe scenariusze biznesowe i edge cases zostały pokryte testami jednostkowymi.

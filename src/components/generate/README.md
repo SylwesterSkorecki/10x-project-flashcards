@@ -5,6 +5,7 @@ This directory contains all components for the AI Flashcard Generation feature.
 ## Overview
 
 The Generate view allows users to:
+
 1. Paste source text (1,000-10,000 characters)
 2. Generate flashcard candidates using AI
 3. Review, edit, accept, or reject candidates
@@ -15,39 +16,46 @@ The Generate view allows users to:
 ### Main Components
 
 #### `GeneratePage.tsx`
+
 - Root component wrapping the entire generate view
 - Manages QueryClient and Toaster
 - Coordinates all subcomponents
 - Handles modal states and commit flow
 
 #### `GenerateFormPanel.tsx`
+
 - Contains the main form for text input
 - Includes TextAreaCounter and GenerateButton
 - Validates input before submission
 
 #### `TextAreaCounter.tsx`
+
 - Textarea with real-time character counting
 - Enforces max length (10,000 chars)
 - Shows validation warnings for min length (1,000 chars)
 - Accessible with aria-live announcements
 
 #### `GenerateButton.tsx`
+
 - Primary CTA button for generation
 - Shows loading state with spinner
 - Disabled states handled automatically
 
 #### `GenerationStatusPanel.tsx`
+
 - Shows generation status (pending/polling/success/failed)
 - Displays elapsed time during generation
 - Provides cancel functionality
 - Progress bar for polling state
 
 #### `CandidatesList.tsx`
+
 - Renders list of generated candidates
 - Handles empty states
 - Proper ARIA roles for accessibility
 
 #### `CandidateCard.tsx`
+
 - Individual flashcard candidate display
 - Shows front/back with expandable back content
 - AI confidence score with color coding
@@ -55,6 +63,7 @@ The Generate view allows users to:
 - Visual indicators for accepted/edited state
 
 #### `EditCandidateModal.tsx`
+
 - Modal dialog for editing candidates
 - Real-time validation (front ≤200, back ≤500 chars)
 - Character count with remaining display
@@ -62,6 +71,7 @@ The Generate view allows users to:
 - Focus management and accessibility
 
 #### `CommitResultModal.tsx`
+
 - Shows results after bulk save
 - Lists saved flashcards
 - Lists skipped flashcards with reasons (e.g., duplicate_front)
@@ -70,6 +80,7 @@ The Generate view allows users to:
 ### Custom Hook
 
 #### `useGenerateFlow` (`src/components/hooks/useGenerateFlow.ts`)
+
 - Encapsulates all generation logic
 - TanStack Query integration:
   - Mutation for POST /api/generations
@@ -82,11 +93,13 @@ The Generate view allows users to:
 ### Supporting Files
 
 #### `types.ts`
+
 - `EditedCandidateViewModel` - Extended candidate with local state
 - `GenerateViewState` - Overall view state
 - `GenerationStatus` - Status enum
 
 #### `index.ts`
+
 - Barrel export for all components and types
 
 ## API Integration
@@ -143,6 +156,7 @@ pending
 ## Toast Notifications
 
 Using `sonner` library:
+
 - Generation started
 - Generation completed with count
 - Save success/partial/failure

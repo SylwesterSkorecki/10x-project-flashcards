@@ -1,13 +1,13 @@
-import '@testing-library/jest-dom';
-import { vi, beforeAll, afterEach, afterAll } from 'vitest';
-import { server } from './tests/mocks/server';
+import "@testing-library/jest-dom";
+import { vi, beforeAll, afterEach, afterAll } from "vitest";
+import { server } from "./tests/mocks/server";
 
 // Mock environment variables
-process.env.PUBLIC_SUPABASE_URL = 'http://localhost:54321';
-process.env.PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+process.env.PUBLIC_SUPABASE_URL = "http://localhost:54321";
+process.env.PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
     matches: false,
@@ -23,26 +23,36 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
+  disconnect(): void {
+    // Mock implementation
+  }
+  observe(): void {
+    // Mock implementation
+  }
   takeRecords() {
     return [];
   }
-  unobserve() {}
-} as any;
+  unobserve(): void {
+    // Mock implementation
+  }
+} as unknown as typeof IntersectionObserver;
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-} as any;
+  disconnect(): void {
+    // Mock implementation
+  }
+  observe(): void {
+    // Mock implementation
+  }
+  unobserve(): void {
+    // Mock implementation
+  }
+} as unknown as typeof ResizeObserver;
 
 // Start MSW server before all tests
 beforeAll(() => {
-  server.listen({ onUnhandledRequest: 'warn' });
+  server.listen({ onUnhandledRequest: "warn" });
 });
 
 // Reset handlers after each test

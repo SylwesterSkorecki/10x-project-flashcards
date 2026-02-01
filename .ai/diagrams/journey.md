@@ -1,12 +1,13 @@
 <user_journey_analysis>
+
 - Ścieżki użytkownika wymienione w PRD/specyfikacji:
-  1) Gość → Rejestracja
-  2) Rejestracja → Weryfikacja email
-  3) Gość → Logowanie
-  4) Zalogowany → Korzystanie z funkcji (generate, flashcards)
-  5) Zapomniałem hasła → Reset hasła
-  6) Ustawienia konta → Usunięcie konta
-  7) Próba dostępu do chronionej strony bez logowania → redirect do login
+  1. Gość → Rejestracja
+  2. Rejestracja → Weryfikacja email
+  3. Gość → Logowanie
+  4. Zalogowany → Korzystanie z funkcji (generate, flashcards)
+  5. Zapomniałem hasła → Reset hasła
+  6. Ustawienia konta → Usunięcie konta
+  7. Próba dostępu do chronionej strony bez logowania → redirect do login
 
 - Główne podróże i stany:
   - Niezalogowany (Landing, Login, Register, ForgotPassword)
@@ -27,9 +28,10 @@
   - Verify: potwierdzić adres email i aktywować konto
   - ForgotPassword/Reset: umożliwić odzyskanie dostępu
   - AccountSettings/Delete: zarządzanie i trwałe usunięcie danych
-</user_journey_analysis>
+    </user_journey_analysis>
 
 <mermaid_diagram>
+
 ```mermaid
 stateDiagram-v2
 [ * ] --> Landing
@@ -75,5 +77,5 @@ Login --> Login : "Błąd (pokaż komunikat)"
 
 [*] --> Landing
 ```
-</mermaid_diagram>
 
+</mermaid_diagram>

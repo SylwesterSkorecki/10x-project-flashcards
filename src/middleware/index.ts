@@ -40,7 +40,7 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
   // When link expires or is invalid, Supabase redirects with error parameters
   const error = url.searchParams.get("error");
   const errorCode = url.searchParams.get("error_code");
-  
+
   if (error && url.pathname === "/") {
     // Handle specific error cases
     if (errorCode === "otp_expired") {
@@ -54,10 +54,10 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
   // When Supabase redirects with ?code=..., exchange it for a session
   const code = url.searchParams.get("code");
   const type = url.searchParams.get("type");
-  
+
   if (code) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    
+
     if (!error && data.session) {
       // Successfully exchanged code for session
       // Redirect based on the type parameter or user state
@@ -67,7 +67,7 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
         } else if (type === "signup") {
           return redirect("/auth/verify-email");
         }
-        
+
         // No type parameter - determine flow from user state
         const user = data.user;
         if (user) {
@@ -78,7 +78,7 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
           // If email IS confirmed, this is password reset
           return redirect("/auth/reset-password");
         }
-        
+
         // Fallback - shouldn't reach here
         return redirect("/generate");
       }

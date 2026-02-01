@@ -62,6 +62,7 @@ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional, defaults to this 
 ```
 
 **Security Notes:**
+
 - Never commit `.env` files to version control
 - Store production API keys in Supabase Secrets or a secure Secrets Manager
 - Rotate API keys periodically for enhanced security

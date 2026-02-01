@@ -11,7 +11,9 @@
 Before testing, verify all components are configured:
 
 ### 1. Environment Variables
+
 Check `.env` file contains:
+
 ```bash
 ✅ SUPABASE_URL=http://127.0.0.1:54321
 ✅ SUPABASE_KEY=eyJhbG...
@@ -21,6 +23,7 @@ Check `.env` file contains:
 ```
 
 ### 2. Database Setup
+
 ```bash
 # Ensure Supabase is running
 supabase status
@@ -35,6 +38,7 @@ npx supabase db reset --local
 ```
 
 ### 3. Verify Tables Exist
+
 ```bash
 # Check tables in Supabase Studio
 # Open: http://127.0.0.1:54323
@@ -46,6 +50,7 @@ npx supabase db reset --local
 ```
 
 ### 4. Start Development Server
+
 ```bash
 npm run dev
 
@@ -64,6 +69,7 @@ npm run dev
 **Steps:**
 
 1. **Navigate to Generate Page**
+
    ```
    Open: http://localhost:4321/generate
    ```
@@ -71,16 +77,17 @@ npm run dev
 2. **Prepare Source Text**
    - Copy a text between **1000-10000 characters** (e.g., Wikipedia article)
    - Example source (Polish):
+
    ```
-   HTTP (Hypertext Transfer Protocol) to protokół komunikacyjny używany do 
-   przesyłania dokumentów hipertekstowych, głównie stron WWW. Jest podstawą 
-   komunikacji w Internecie i stanowi fundament World Wide Web. HTTP działa 
-   w modelu klient-serwer, gdzie klient (zazwyczaj przeglądarka) wysyła 
-   żądanie do serwera, a serwer odpowiada żądanym zasobem. Protokół definiuje 
-   metody żądań (GET, POST, PUT, DELETE itp.) oraz kody statusu odpowiedzi 
-   (200 OK, 404 Not Found, 500 Internal Server Error itp.). HTTP jest protokołem 
-   bezstanowym, co oznacza, że każde żądanie jest niezależne od poprzednich. 
-   Wersja HTTPS (HTTP Secure) dodaje warstwę szyfrowania SSL/TLS, zapewniając 
+   HTTP (Hypertext Transfer Protocol) to protokół komunikacyjny używany do
+   przesyłania dokumentów hipertekstowych, głównie stron WWW. Jest podstawą
+   komunikacji w Internecie i stanowi fundament World Wide Web. HTTP działa
+   w modelu klient-serwer, gdzie klient (zazwyczaj przeglądarka) wysyła
+   żądanie do serwera, a serwer odpowiada żądanym zasobem. Protokół definiuje
+   metody żądań (GET, POST, PUT, DELETE itp.) oraz kody statusu odpowiedzi
+   (200 OK, 404 Not Found, 500 Internal Server Error itp.). HTTP jest protokołem
+   bezstanowym, co oznacza, że każde żądanie jest niezależne od poprzednich.
+   Wersja HTTPS (HTTP Secure) dodaje warstwę szyfrowania SSL/TLS, zapewniając
    bezpieczną komunikację poprzez szyfrowanie przesyłanych danych.
    [... continue until 1000+ characters ...]
    ```
@@ -239,6 +246,7 @@ npm run dev
 #### A. Invalid API Key
 
 1. **Temporarily Break API Key**
+
    ```bash
    # Edit .env
    OPENROUTER_API_KEY=invalid-key-xxx
@@ -322,6 +330,7 @@ npm run dev
 5. Accept and save different candidates
 
 **Verify:**
+
 - Both generations stored in `generations` table
 - Each has unique ID
 - Flashcards correctly linked to their generation_id
@@ -360,22 +369,26 @@ npm run dev
 ### Success Indicators
 
 ✅ **API Integration**:
+
 - Requests reach OpenRouter successfully
 - Responses are valid JSON matching schema
 - Validation works (retry mechanism if needed)
 
 ✅ **Database**:
+
 - Generations recorded correctly
 - Flashcards saved with all required fields
 - Errors logged appropriately
 
 ✅ **UI/UX**:
+
 - Smooth flow from generate → review → save
 - Toast notifications work
 - Modals open/close properly
 - Loading states shown
 
 ✅ **Error Handling**:
+
 - Errors caught and displayed
 - User-friendly messages
 - No crashes or blank screens
@@ -383,15 +396,18 @@ npm run dev
 ### Potential Issues
 
 ❌ **API Errors**:
+
 - 401 Unauthorized → Check API key
 - 429 Rate Limited → Wait and retry
 - 504 Timeout → Use shorter text or wait
 
 ❌ **Database Errors**:
+
 - "Failed to store generation record" → Check Supabase connection
 - Unique constraint violation → Expected for duplicate fronts
 
 ❌ **Validation Errors**:
+
 - "Invalid response format" → Check JSON schema matches AI output
 - "Validation failed" → AI returned malformed JSON
 
@@ -400,11 +416,13 @@ npm run dev
 ## 📊 Monitoring Dashboard
 
 ### Supabase Studio
+
 ```
 URL: http://127.0.0.1:54323
 ```
 
 **Tables to Monitor**:
+
 - `generations` - All AI generation attempts
 - `flashcards` - Saved flashcards
 - `generation_error_logs` - Errors for debugging
@@ -413,27 +431,27 @@ URL: http://127.0.0.1:54323
 
 ```sql
 -- Recent generations
-SELECT * FROM generations 
-ORDER BY created_at DESC 
+SELECT * FROM generations
+ORDER BY created_at DESC
 LIMIT 10;
 
 -- Success rate
-SELECT 
+SELECT
   COUNT(*) as total_generations,
   AVG(generated_count) as avg_candidates
 FROM generations
 WHERE created_at > now() - interval '1 hour';
 
 -- Error frequency
-SELECT 
-  error_code, 
+SELECT
+  error_code,
   COUNT(*) as count
 FROM generation_error_logs
 WHERE created_at > now() - interval '1 hour'
 GROUP BY error_code;
 
 -- Recent flashcards
-SELECT 
+SELECT
   f.front,
   f.source,
   g.model,
@@ -449,28 +467,37 @@ LIMIT 10;
 ## 🐛 Troubleshooting
 
 ### "API key not configured"
+
 **Solution**: Check `.env` has `OPENROUTER_API_KEY`
 
 ### "Database client not available"
+
 **Solution**: Restart dev server, check Supabase is running
 
 ### "Circuit breaker is OPEN"
+
 **Solution**: Wait 60 seconds or restart dev server
 
 ### "Validation failed after X attempts"
-**Solution**: 
+
+**Solution**:
+
 - Check AI is returning correct JSON format
 - Inspect response in console logs
 - May need to adjust system prompt or schema
 
 ### "Failed to store generation record"
+
 **Solution**:
+
 - Check Supabase connection
 - Verify migrations applied: `npx supabase db reset --local`
 - Check RLS is disabled for testing
 
 ### Flashcards not appearing in database
+
 **Solution**:
+
 - Open DevTools Network tab
 - Check if POST to `/api/generations` succeeded (200)
 - Check response body for errors
@@ -481,11 +508,13 @@ LIMIT 10;
 ## ✨ Success Criteria
 
 **Minimum Viable Test**:
+
 - ✅ Generate flashcards from real AI
 - ✅ Save at least 1 flashcard to database
 - ✅ Verify in Supabase Studio
 
 **Full Success**:
+
 - ✅ All scenarios 1-6 pass
 - ✅ No console errors
 - ✅ Data persists in database
@@ -502,26 +531,30 @@ Use this to track your testing:
 ## Test Session: [Date/Time]
 
 ### Environment
+
 - Node version: [run `node -v`]
 - Supabase status: [running/stopped]
 - OpenRouter API: [configured/not configured]
 
 ### Scenario 1: Happy Path
+
 - [ ] Generated flashcards: YES/NO
-- [ ] Count: ___
+- [ ] Count: \_\_\_
 - [ ] Saved to DB: YES/NO
-- [ ] Issues: ___
+- [ ] Issues: \_\_\_
 
 ### Scenario 2: Edit
+
 - [ ] Edit modal works: YES/NO
 - [ ] Saved as "ai-edited": YES/NO
-- [ ] Issues: ___
+- [ ] Issues: \_\_\_
 
 [... continue for each scenario ...]
 
 ### Overall Result
+
 - Status: ✅ PASS / ❌ FAIL
-- Notes: ___
+- Notes: \_\_\_
 ```
 
 ---

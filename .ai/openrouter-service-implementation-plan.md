@@ -5,6 +5,7 @@ Poniższy dokument to kompletny przewodnik implementacji usługi integrującej O
 > Uwaga: sekcja "implementation_breakdown" zawiera skróconą, jawnie ustrukturyzowaną analizę projektową (bez ujawniania prywatnych myśli).
 
 <implementation_breakdown>
+
 - Kluczowe komponenty:
   1. OpenRouterClient — klient HTTP zarządzający połączeniem do OpenRouter (autoryzacja, retry, logowanie).
   2. ConversationAdapter — warstwa mapująca lokalny format czatu (messages) na strukturę oczekiwaną przez OpenRouter i odwrotnie.
@@ -12,13 +13,14 @@ Poniższy dokument to kompletny przewodnik implementacji usługi integrującej O
   4. RateLimiter/Backoff — mechanizm ochrony przed limitami i agresywnymi retry.
   5. Telemetria i logowanie — zbieranie metryk, zdarzeń błędów i kosztów.
   6. Config/SecretsManager — bezpieczne przechowywanie kluczy i mapowania modeli.
-</implementation_breakdown>
+     </implementation_breakdown>
 
 ---
 
 ## 1. Opis usługi
 
 OpenRouterService to moduł TypeScript zapewniający bezpieczną i ustandaryzowaną integrację z OpenRouter API w celu generowania odpowiedzi LLM w ramach czatu. Zapewnia:
+
 - jednolity klient HTTP z retry i backoff,
 - translację i walidację `response_format` (JSON Schema),
 - obsługę parametrów modelu i mapowania nazw modeli,
@@ -45,6 +47,7 @@ new OpenRouterService({
 ```
 
 Konstruktor inicjalizuje:
+
 - fetch client z nagłówkiem Authorization `Bearer ${apiKey}`,
 - retry/backoff policy,
 - opcjonalny lokalny rate limiter,
@@ -73,42 +76,49 @@ Poniżej przykładowe API modułu.
   - Opis: aktualizacja klucza (np. rotacja).
 
 Pola:
+
 - defaultModel (string)
 - lastRequestMeta (meta info dla debugowania)
 
 Interfejsy (sugestia):
 
 ```ts
-type Role = 'system'|'user'|'assistant';
-interface ChatMessage { role: Role; content: string; name?: string; metadata?: Record<string, any> }
+type Role = "system" | "user" | "assistant";
+interface ChatMessage {
+  role: Role;
+  content: string;
+  name?: string;
+  metadata?: Record<string, any>;
+}
 interface ResponseFormat {
-  type: 'json_schema';
-  json_schema: { name: string; strict: boolean; schema: any }
+  type: "json_schema";
+  json_schema: { name: string; strict: boolean; schema: any };
 }
 ```
 
 ## 4. Prywatne metody i pola
 
-- _request(payload): internal HTTP wrapper
+- \_request(payload): internal HTTP wrapper
   - Obsługuje fetch, timeout, retry, backoff, logowanie request/response sizes i kosztów.
 
-- _mapToOpenRouterMessages(messages: ChatMessage[]): OpenRouterMessage[]
+- \_mapToOpenRouterMessages(messages: ChatMessage[]): OpenRouterMessage[]
   - Mapuje lokalny model wiadomości do struktury zgodnej z OpenRouter (role, content, name).
 
-- _applyResponseFormat(response, responseFormat)
+- \_applyResponseFormat(response, responseFormat)
   - Wydobywa modelową odpowiedź i waliduje/parsuje JSON zgodnie z `response_format`.
 
-- _handleStream(stream, onEvent)
+- \_handleStream(stream, onEvent)
   - Dla trybu stream: parsuje chunkowane dane, emituje partiale i finalne zdarzenia.
 
-- _handleRateLimit(headers)
+- \_handleRateLimit(headers)
   - Wyciąga informacje o limitach z nagłówków i odpowiednio ustawia backoff.
 
-- _logTelemetry(event)
+- \_logTelemetry(event)
   - Rejestruje zdarzenia kosztowe i błędy do telemetry (Prometheus/Datadog/Sentry).
 
 Pola prywatne:
-- _httpClient, _apiKey, _baseUrl, _retryPolicy, _rateLimiter, _schemasCache
+
+- \_httpClient, \_apiKey, \_baseUrl, \_retryPolicy, \_rateLimiter, \_schemasCache
 
 ## 5. Obsługa błędów
 
@@ -160,7 +170,7 @@ Potencjalne scenariusze błędów (numerowane) i zalecane reakcje:
 
 ## 7. Konfiguracja wiadomości i response_format (konkretne przykłady)
 
-1) Komunikat systemowy (System Message)
+1. Komunikat systemowy (System Message)
 
 Przykład:
 
@@ -173,7 +183,7 @@ Przykład:
 
 Zastosowanie: dodaj jako pierwszą wiadomość w payloadzie — ujednolica behavior modelu.
 
-2) Komunikat użytkownika (User Message)
+2. Komunikat użytkownika (User Message)
 
 Przykład:
 
@@ -184,9 +194,10 @@ Przykład:
 }
 ```
 
-3) Response_format — przykład poprawnie zdefiniowanego schematu
+3. Response_format — przykład poprawnie zdefiniowanego schematu
 
 Wzorzec:
+
 ```json
 {
   "type": "json_schema",
@@ -195,11 +206,11 @@ Wzorzec:
     "strict": true,
     "schema": {
       "type": "object",
-      "required": ["question","answer","difficulty"],
+      "required": ["question", "answer", "difficulty"],
       "properties": {
         "question": { "type": "string" },
         "answer": { "type": "string" },
-        "difficulty": { "type": "string", "enum": ["easy","medium","hard"] },
+        "difficulty": { "type": "string", "enum": ["easy", "medium", "hard"] },
         "tags": { "type": "array", "items": { "type": "string" } }
       },
       "additionalProperties": false
@@ -209,17 +220,18 @@ Wzorzec:
 ```
 
 Zastosowanie w implementacji:
+
 - Dołącz `response_format` bezpośrednio w body wysyłanego payloadu do OpenRouter (pole `response_format` zgodnie z API OpenRouter).
 - Po otrzymaniu odpowiedzi użyj ResponseValidator; jeśli `strict: true` i walidacja nie przejdzie → zainicjuj retry z doprecyzowaniem promptu.
 
-4) Nazwa modelu — przykłady i strategia
+4. Nazwa modelu — przykłady i strategia
 
 - Przykłady: `"openai/gpt-4o-mini"`, `"anthropic/claude-2"`, `"google/vertex-wealthy-model"` (mapuj aliasy do wartości oczekiwanych przez OpenRouter).
 - Strategia:
   - Trzy poziomy: `defaultModel` (np. tańszy, szybki), `highQualityModel` (droższy), `fallbackModel`.
   - W metadata requestu przechowuj użyty model i koszt estimate.
 
-5) Parametry modelu — typowe pola i wartości
+5. Parametry modelu — typowe pola i wartości
 
 - temperature (0.0–1.2) — kontrola kreatywności; do zwracania ściśle sformatowanego JSON ustaw 0–0.2.
 - max_tokens — limit odpowiedzi (dobrze ustawić bezpieczny cap).
@@ -241,11 +253,13 @@ Przykładowy options object:
 ## 8. Szczegółowy plan wdrożenia krok po kroku (dostosowany do stacku)
 
 Faza 0 — Przygotowanie środowiska
+
 1. Dodaj env vars: `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL` (opcjonalne), `OPENROUTER_DEFAULT_MODEL`.
 2. Zadbaj o Secrets Manager (Supabase env lub Vault) i dodaj instrukcję rotacji kluczy.
 3. Zaktualizuj README z instrukcjami lokalnego uruchomienia i zmiennymi środowiskowymi.
 
 Faza 1 — Implementacja klienta
+
 1. W `src/lib/services` utwórz `openrouter.service.ts`.
 2. Implementuj konstruktor zgodnie z sekcją 2.
 3. Dodaj wewnętrzny HTTP wrapper oparty na fetch/undici z timeout i retry.
@@ -253,22 +267,26 @@ Faza 1 — Implementacja klienta
 5. Pokryj klient testami jednostkowymi (mock fetch).
 
 Faza 2 — ConversationAdapter i response_format
+
 1. Implementuj `_mapToOpenRouterMessages` aby wspierać role `system`, `user`, `assistant`.
 2. Zdefiniuj standardowe `system` messages w `src/lib/openrouter/templates.ts`.
 3. Implementuj `ResponseValidator` używając biblioteki JSON Schema (ajv).
 4. Dodaj mechanizm retry-on-invalid-response: jeśli walidacja nie przejdzie → poproś model o ponowne wygenerowanie tylko pola JSON (z ograniczonym retry).
 
 Faza 3 — Integracja z API aplikacji
+
 1. W endpointzie `src/pages/api/flashcards/[id].ts` lub dedykowanym endpoint `src/pages/api/generate` użyj `OpenRouterService.sendChatMessage`.
 2. Stwórz adapter wejścia, który przyjmuje front-endowe `messages` i opcjonalny `responseFormat`.
 3. Zaimplementuj kontrolę kosztów — pre-flight estimate tokenów jeśli dostępne.
 
 Faza 4 — Observability i bezpieczeństwo
+
 1. Dodaj logowanie request/response meta (rozmiary, model, tokens), bez logowania PII.
 2. Instrumentuj metryki (request count, error count, cost/usage).
 3. Dodaj alerts w GH Actions / monitoring (np. gdy koszty rosną).
 
 ## 9. Dodatkowe uwagi i najlepsze praktyki
+
 - Ustaw `temperature: 0` dla ścisłej zgodności ze schematami.
 - Zawsze używaj `system` message, aby narzucić reguły zachowania modelu (np. "odpowiadaj wyłącznie JSON").
 - Używaj `strict: true` w produkcyjnych endpointach, ale dopuszczaj `strict: false` w trybie eksperymentalnym.
@@ -278,4 +296,3 @@ Faza 4 — Observability i bezpieczeństwo
 ---
 
 Plik stworzony jako przewodnik implementacyjny — użyj go jako check-listy przy wdrożeniu i do implementacji `OpenRouterService` w `src/lib/services`.
-

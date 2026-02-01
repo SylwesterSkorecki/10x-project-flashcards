@@ -8,33 +8,33 @@ Data: 2026-02-01
 
 src/components
 ├─ ui
-│  ├─ button.tsx
-│  ├─ input.tsx
-│  ├─ label.tsx
-│  ├─ textarea.tsx
-│  ├─ dialog.tsx  ──> imports: ui/button
-│  └─ sonner.tsx
+│ ├─ button.tsx
+│ ├─ input.tsx
+│ ├─ label.tsx
+│ ├─ textarea.tsx
+│ ├─ dialog.tsx ──> imports: ui/button
+│ └─ sonner.tsx
 ├─ auth
-│  ├─ ForgotPasswordForm.tsx  ──> imports: ui/button, ui/input, ui/label
-│  ├─ LoginForm.tsx           ──> imports: ui/button, ui/input, ui/label
-│  ├─ RegisterForm.tsx        ──> imports: ui/button, ui/input, ui/label
-│  └─ ResetPasswordForm.tsx   ──> imports: ui/button, ui/input, ui/label
+│ ├─ ForgotPasswordForm.tsx ──> imports: ui/button, ui/input, ui/label
+│ ├─ LoginForm.tsx ──> imports: ui/button, ui/input, ui/label
+│ ├─ RegisterForm.tsx ──> imports: ui/button, ui/input, ui/label
+│ └─ ResetPasswordForm.tsx ──> imports: ui/button, ui/input, ui/label
 ├─ generate
-│  ├─ GeneratePage.tsx        ──> imports: generate/GenerateFormPanel, GenerationStatusPanel, CandidatesList, EditCandidateModal, CommitResultModal, ui/sonner, ui/button, hooks/useGenerateFlow
-│  ├─ GenerateFormPanel.tsx   ──> imports: TextAreaCounter, GenerateButton
-│  ├─ TextAreaCounter.tsx
-│  ├─ GenerateButton.tsx      ──> imports: ui/button
-│  ├─ GenerationStatusPanel.tsx ──> imports: ui/button
-│  ├─ CandidatesList.tsx      ──> imports: CandidateCard
-│  ├─ CandidateCard.tsx       ──> imports: ui/button
-│  ├─ EditCandidateModal.tsx  ──> imports: ui/dialog, ui/button, ui/label, ui/input, ui/textarea
-│  └─ CommitResultModal.tsx   ──> imports: ui/dialog, ui/button
+│ ├─ GeneratePage.tsx ──> imports: generate/GenerateFormPanel, GenerationStatusPanel, CandidatesList, EditCandidateModal, CommitResultModal, ui/sonner, ui/button, hooks/useGenerateFlow
+│ ├─ GenerateFormPanel.tsx ──> imports: TextAreaCounter, GenerateButton
+│ ├─ TextAreaCounter.tsx
+│ ├─ GenerateButton.tsx ──> imports: ui/button
+│ ├─ GenerationStatusPanel.tsx ──> imports: ui/button
+│ ├─ CandidatesList.tsx ──> imports: CandidateCard
+│ ├─ CandidateCard.tsx ──> imports: ui/button
+│ ├─ EditCandidateModal.tsx ──> imports: ui/dialog, ui/button, ui/label, ui/input, ui/textarea
+│ └─ CommitResultModal.tsx ──> imports: ui/dialog, ui/button
 ├─ account
-│  └─ AccountSettings.tsx     ──> imports: ui/button, ui/input, ui/label, ui/dialog
+│ └─ AccountSettings.tsx ──> imports: ui/button, ui/input, ui/label, ui/dialog
 ├─ layout
-│  └─ Navigation.tsx          ──> imports: ui/button
-└─ __tests__
-   └─ components/Button.test.tsx ──> imports: ui/button
+│ └─ Navigation.tsx ──> imports: ui/button
+└─ **tests**
+└─ components/Button.test.tsx ──> imports: ui/button
 
 ## Podsumowanie — co warto przetestować i dlaczego
 
@@ -80,10 +80,11 @@ Krótko — skup się najpierw na modułach z logiką (czyste funkcje / hooki / 
   - Dlaczego: proste, szybkie testy, niskie koszty, duża wartość zabezpieczenia.
 
 ## Priorytety
+
 - Wysoki: GenerationsService + useGenerateFlow (najwięcej logiki i ryzyko)
 - Średni: TextAreaCounter, GenerationStatusPanel, CandidateCard, EditCandidateModal
 - Niski: CommitResultModal, CandidatesList, GenerateFormPanel, GenerateButton, proste UI wrappers
 
 ## Dalsze kroki
-- Jeśli chcesz, mogę wygenerować przykładowy test (Vitest + Testing Library) dla jednego z powyższych komponentów/hooków. Który wybierasz?
 
+- Jeśli chcesz, mogę wygenerować przykładowy test (Vitest + Testing Library) dla jednego z powyższych komponentów/hooków. Który wybierasz?

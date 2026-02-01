@@ -5,14 +5,17 @@ Ten katalog zawiera komponenty React odpowiedzialne za interfejs użytkownika pr
 ## Komponenty
 
 ### LoginForm
+
 **Lokalizacja:** `LoginForm.tsx`
 
 Formularz logowania użytkownika.
 
 **Props:**
+
 - `returnTo?: string` - URL do którego użytkownik zostanie przekierowany po zalogowaniu
 
 **Funkcjonalność:**
+
 - Walidacja emaila i hasła (Zod)
 - Wyświetlanie błędów walidacji w czasie rzeczywistym
 - Obsługa komunikatów błędów z Supabase
@@ -20,11 +23,13 @@ Formularz logowania użytkownika.
 - Linki do rejestracji i resetowania hasła
 
 **TODO dla implementacji backend:**
+
 - Zintegrować z `supabaseClient.auth.signInWithPassword()`
 - Obsłużyć przekierowanie po sukcesie
 - Zaimplementować mapowanie błędów Supabase
 
 ### RegisterForm
+
 **Lokalizacja:** `RegisterForm.tsx`
 
 Formularz rejestracji nowego użytkownika.
@@ -32,6 +37,7 @@ Formularz rejestracji nowego użytkownika.
 **Props:** Brak
 
 **Funkcjonalność:**
+
 - Pola: email, hasło, potwierdzenie hasła
 - Walidacja złożoności hasła (min. 10 znaków, wielka/mała litera, cyfra)
 - Sprawdzanie zgodności haseł
@@ -39,10 +45,12 @@ Formularz rejestracji nowego użytkownika.
 - Link do logowania
 
 **TODO dla implementacji backend:**
+
 - Zintegrować z `supabaseClient.auth.signUp()`
 - Skonfigurować `emailRedirectTo` dla weryfikacji emaila
 
 ### ForgotPasswordForm
+
 **Lokalizacja:** `ForgotPasswordForm.tsx`
 
 Formularz żądania resetu hasła.
@@ -50,6 +58,7 @@ Formularz żądania resetu hasła.
 **Props:** Brak
 
 **Funkcjonalność:**
+
 - Pole emaila
 - Walidacja formatu emaila
 - Ekran sukcesu z informacją o wysłaniu linku
@@ -57,10 +66,12 @@ Formularz żądania resetu hasła.
 - Komunikat bezpieczeństwa (nie ujawnia czy konto istnieje)
 
 **TODO dla implementacji backend:**
+
 - Zintegrować z `supabaseClient.auth.resetPasswordForEmail()`
 - Skonfigurować `redirectTo` dla strony reset-password
 
 ### ResetPasswordForm
+
 **Lokalizacja:** `ResetPasswordForm.tsx`
 
 Formularz ustawiania nowego hasła po kliknięciu linku z emaila.
@@ -68,11 +79,13 @@ Formularz ustawiania nowego hasła po kliknięciu linku z emaila.
 **Props:** Brak
 
 **Funkcjonalność:**
+
 - Pola: nowe hasło, potwierdzenie nowego hasła
 - Walidacja złożoności hasła
 - Stan ładowania podczas aktualizacji
 
 **TODO dla implementacji backend:**
+
 - Zintegrować z `supabaseClient.auth.updateUser({ password })`
 - Obsłużyć przekierowanie do logowania po sukcesie
 - Sprawdzić ważność tokenu weryfikacyjnego z URL
@@ -89,6 +102,7 @@ Wszystkie formularze używają schematów Zod zdefiniowanych w `@/lib/schemas/au
 ## Styl i design
 
 Komponenty używają:
+
 - Shadcn/ui dla podstawowych komponentów (Button, Input, Label, Dialog)
 - Tailwind CSS dla stylowania
 - Lucide React dla ikon
@@ -111,6 +125,7 @@ Obecnie wszystkie wywołania API są zakomentowane i zawierają placeholder logi
 ## Dostępność (Accessibility)
 
 Wszystkie formularze implementują:
+
 - Semantyczne HTML
 - ARIA labels i opisы
 - Prawidłowe powiązania label-input
@@ -121,14 +136,14 @@ Wszystkie formularze implementują:
 ## Użycie
 
 ```tsx
-import { LoginForm } from '@/components/auth';
+import { LoginForm } from "@/components/auth";
 
 // W komponencie Astro:
-<LoginForm client:load returnTo="/generate" />
+<LoginForm client:load returnTo="/generate" />;
 ```
 
 ```tsx
-import { RegisterForm } from '@/components/auth';
+import { RegisterForm } from "@/components/auth";
 
-<RegisterForm client:load />
+<RegisterForm client:load />;
 ```

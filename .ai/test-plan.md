@@ -3,9 +3,11 @@
 ## 1. Wprowadzenie i cele testowania
 
 ### Cel projektu
+
 SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek edukacyjnych przy użyciu sztucznej inteligencji. Aplikacja wykorzystuje modele AI (poprzez OpenRouter.ai) do automatycznego tworzenia pytań i odpowiedzi na podstawie tekstu źródłowego dostarczanego przez użytkownika.
 
 ### Cele testowania
+
 - **Zapewnienie wysokiej jakości** kodu i funkcjonalności przed wdrożeniem na produkcję
 - **Weryfikacja poprawności** kluczowych funkcji aplikacji (uwierzytelnianie, generowanie fiszek, zarządzanie danymi)
 - **Identyfikacja i eliminacja** krytycznych błędów bezpieczeństwa, szczególnie w obszarze autoryzacji i dostępu do danych
@@ -16,6 +18,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 2. Zakres testów
 
 ### W zakresie testów:
+
 - ✅ Wszystkie komponenty React (auth, generate, layout, settings)
 - ✅ Wszystkie API endpoints Astro
 - ✅ Warstwy serwisów (FlashcardsService, GenerationsService, OpenRouterService)
@@ -29,6 +32,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - ✅ Bezpieczeństwo (autoryzacja, weryfikacja własności, XSS, CSRF)
 
 ### Poza zakresem testów:
+
 - ❌ Testy wydajnościowe pod dużym obciążeniem (stress testing)
 - ❌ Testy penetracyjne (security penetration testing)
 - ❌ Testy kompatybilności z przeglądarkami starszymi niż 2 lata
@@ -39,9 +43,11 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 3. Typy testów do przeprowadzenia
 
 ### 3.1. Testy jednostkowe (Unit Tests)
+
 **Narzędzie**: Vitest + React Testing Library
 
 **Zakres**:
+
 - Serwisy (`src/lib/services/`):
   - `FlashcardsService` - getFlashcard, updateFlashcard
   - `GenerationsService` - generateFlashcards, estimateGenerationCost, metody prywatne
@@ -57,13 +63,16 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
   - Komponenty prezentacyjne (CandidateCard, CandidatesList)
 
 **Kryteria**:
+
 - Pokrycie kodu: minimum 80% dla serwisów i schematów
 - Każda funkcja publiczna powinna mieć co najmniej 3 testy (happy path, edge case, error case)
 
 ### 3.2. Testy integracyjne (Integration Tests)
+
 **Narzędzie**: Vitest + Supertest (dla API) + testowa baza Supabase
 
 **Zakres**:
+
 - API endpoints z rzeczywistą bazą testową:
   - POST `/api/generations` - generowanie fiszek (z mockowanym OpenRouter)
   - GET `/api/generations/[id]` - pobranie generacji
@@ -80,14 +89,17 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
   - Concurrent requests
 
 **Kryteria**:
+
 - Wszystkie API endpoints muszą być przetestowane
 - Testy muszą używać testowej bazy danych (Supabase local lub dedykowany projekt testowy)
 - Testy muszą być izolowane (rollback po każdym teście)
 
 ### 3.3. Testy komponentów (Component Tests)
+
 **Narzędzie**: Vitest + React Testing Library
 
 **Zakres**:
+
 - Komponenty auth z logiką:
   - `LoginForm` - walidacja, obsługa błędów Supabase, przekierowanie
   - `RegisterForm` - walidacja hasła, komunikat sukcesu
@@ -103,14 +115,17 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
   - `AccountSettings` - wyświetlanie danych, usuwanie konta
 
 **Kryteria**:
+
 - Testy interakcji użytkownika (click, input, submit)
 - Testy walidacji formularzy
 - Testy wyświetlania błędów i komunikatów
 
 ### 3.4. Testy end-to-end (E2E)
+
 **Narzędzie**: Playwright
 
 **Zakres**:
+
 - Przepływ rejestracji i weryfikacji email
 - Przepływ logowania i wylogowania
 - Przepływ zapomnienia hasła i resetu
@@ -125,14 +140,17 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - Przepływ obsługi błędów (network error, API error, validation error)
 
 **Kryteria**:
+
 - Testy na różnych przeglądarkach (Chrome, Firefox, Safari)
 - Testy responsywności (desktop, tablet, mobile)
 - Testy dostępności (a11y) - keyboard navigation, screen reader
 
 ### 3.5. Testy bezpieczeństwa (Security Tests)
+
 **Narzędzie**: Manualne + automatyczne (OWASP ZAP opcjonalnie)
 
 **Zakres**:
+
 - **Autoryzacja i autentykacja**:
   - Próba dostępu do zasobów bez logowania
   - Próba dostępu do zasobów innego użytkownika
@@ -150,31 +168,38 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
   - Weryfikacja, że API keys nie są eksponowane w response
 
 **Kryteria**:
+
 - Wszystkie testy bezpieczeństwa muszą zakończyć się sukcesem przed wdrożeniem
 
 ### 3.6. Testy wydajnościowe (Performance Tests) - ograniczone
+
 **Narzędzie**: Lighthouse, WebPageTest
 
 **Zakres**:
+
 - Czas ładowania strony głównej (index.astro)
 - Czas ładowania strony generowania (generate.astro)
 - Czas wykonania bulk insert (commit endpoint)
 - Czas odpowiedzi API endpoints (< 500ms dla CRUD, < 10s dla generowania)
 
 **Kryteria**:
+
 - Lighthouse score > 90 dla Performance
 - First Contentful Paint < 1.5s
 - Time to Interactive < 3.5s
 
 ### 3.7. Testy regresyjne (Regression Tests)
+
 **Narzędzie**: Zautomatyzowane testy z poprzednich typów + smoke tests
 
 **Zakres**:
+
 - Uruchamiane przed każdym wdrożeniem
 - Weryfikacja, że nowe zmiany nie złamały istniejącej funkcjonalności
 - Smoke tests dla kluczowych przepływów
 
 **Kryteria**:
+
 - 100% testów regresyjnych musi przejść przed wdrożeniem
 
 ## 4. Scenariusze testowe dla kluczowych funkcjonalności
@@ -182,8 +207,10 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ### 4.1. Uwierzytelnianie użytkownika
 
 #### Scenariusz 1.1: Rejestracja nowego użytkownika - happy path
+
 **Warunki wstępne**: Użytkownik nie jest zalogowany, email nie istnieje w systemie
 **Kroki**:
+
 1. Użytkownik otwiera `/auth/register`
 2. Użytkownik wprowadza email: `test@example.com`
 3. Użytkownik wprowadza hasło: `SecurePass123` (spełnia wymagania)
@@ -191,6 +218,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 5. Użytkownik klika "Zarejestruj się"
 
 **Oczekiwany rezultat**:
+
 - Konto zostaje utworzone w Supabase
 - Email weryfikacyjny zostaje wysłany
 - Użytkownik widzi komunikat: "Sprawdź swoją skrzynkę email, aby potwierdzić konto"
@@ -199,28 +227,34 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Krytyczny
 
 #### Scenariusz 1.2: Rejestracja z niepoprawnym hasłem
+
 **Warunki wstępne**: Użytkownik nie jest zalogowany
 **Kroki**:
+
 1. Użytkownik otwiera `/auth/register`
 2. Użytkownik wprowadza email: `test@example.com`
 3. Użytkownik wprowadza hasło: `weak` (nie spełnia wymagań)
 4. Użytkownik klika "Zarejestruj się"
 
 **Oczekiwany rezultat**:
+
 - Formularz pokazuje błąd walidacji: "Hasło musi mieć minimum 10 znaków, zawierać wielką i małą literę oraz cyfrę"
 - Konto nie zostaje utworzone
 
 **Priorytet**: Wysoki
 
 #### Scenariusz 1.3: Logowanie z poprawnymi danymi
+
 **Warunki wstępne**: Użytkownik ma zweryfikowane konto
 **Kroki**:
+
 1. Użytkownik otwiera `/auth/login`
 2. Użytkownik wprowadza email: `test@example.com`
 3. Użytkownik wprowadza hasło: `SecurePass123`
 4. Użytkownik klika "Zaloguj się"
 
 **Oczekiwany rezultat**:
+
 - Użytkownik zostaje zalogowany
 - Sesja zostaje utworzona (cookie)
 - Użytkownik zostaje przekierowany na `/generate`
@@ -228,21 +262,26 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Krytyczny
 
 #### Scenariusz 1.4: Logowanie bez weryfikacji email
+
 **Warunki wstępne**: Użytkownik ma konto, ale nie zweryfikował email
 **Kroki**:
+
 1. Użytkownik otwiera `/auth/login`
 2. Użytkownik wprowadza poprawne dane logowania
 3. Użytkownik klika "Zaloguj się"
 
 **Oczekiwany rezultat**:
+
 - Logowanie zostaje odrzucone
 - Użytkownik widzi komunikat: "Proszę potwierdzić adres email przed zalogowaniem"
 
 **Priorytet**: Wysoki
 
 #### Scenariusz 1.5: Reset hasła - pełny przepływ
+
 **Warunki wstępne**: Użytkownik ma zweryfikowane konto
 **Kroki**:
+
 1. Użytkownik otwiera `/auth/forgot-password`
 2. Użytkownik wprowadza email: `test@example.com`
 3. Użytkownik klika "Wyślij link resetujący"
@@ -253,6 +292,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 8. Użytkownik klika "Ustaw nowe hasło"
 
 **Oczekiwany rezultat**:
+
 - Hasło zostaje zmienione
 - Użytkownik widzi komunikat sukcesu
 - Użytkownik może zalogować się nowym hasłem
@@ -262,8 +302,10 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ### 4.2. Generowanie fiszek
 
 #### Scenariusz 2.1: Generowanie fiszek - happy path
+
 **Warunki wstępne**: Użytkownik jest zalogowany
 **Kroki**:
+
 1. Użytkownik otwiera `/generate`
 2. Użytkownik wprowadza tekst źródłowy (3000 znaków) o tematyce historycznej
 3. Użytkownik klika "Generuj fiszki"
@@ -272,6 +314,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 6. Kandydaci wyświetlają się na liście
 
 **Oczekiwany rezultat**:
+
 - Generacja zostaje zapisana w tabeli `generations`
 - Użytkownik widzi listę 10 kandydatów ze statusem `pending`
 - Każdy kandydat ma akcje: Accept, Edit, Reject
@@ -280,21 +323,26 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Krytyczny
 
 #### Scenariusz 2.2: Generowanie z tekstem poza zakresem
+
 **Warunki wstępne**: Użytkownik jest zalogowany
 **Kroki**:
+
 1. Użytkownik otwiera `/generate`
 2. Użytkownik wprowadza tekst źródłowy (500 znaków - poniżej minimum)
 3. Użytkownik klika "Generuj fiszki"
 
 **Oczekiwany rezultat**:
+
 - Walidacja po stronie klienta pokazuje błąd: "Tekst musi mieć od 1000 do 10000 znaków"
 - Request nie jest wysyłany do API
 
 **Priorytet**: Średni
 
 #### Scenariusz 2.3: Edycja kandydata przed akceptacją
+
 **Warunki wstępne**: Użytkownik wygenerował fiszki, kandydaci są widoczne
 **Kroki**:
+
 1. Użytkownik klika "Edit" na jednym kandydacie
 2. Modal `EditCandidateModal` się otwiera
 3. Użytkownik zmienia front z "Pytanie 1" na "Zmodyfikowane pytanie 1"
@@ -302,6 +350,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 5. Użytkownik klika "Zapisz"
 
 **Oczekiwany rezultat**:
+
 - Modal się zamyka
 - Kandydat ma zaktualizowane front/back
 - Status kandydata zmienia się na `edited`
@@ -310,14 +359,17 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Wysoki
 
 #### Scenariusz 2.4: Akceptacja kandydatów i zapis do bazy
+
 **Warunki wstępne**: Użytkownik wygenerował fiszki, wybrał 5 kandydatów (3 niezmienione, 2 edytowane)
 **Kroki**:
+
 1. Użytkownik klika "Accept" na 5 kandydatach
 2. Użytkownik klika "Zapisz zaakceptowane fiszki"
 3. System wysyła request do POST `/api/generations/[id]/commit`
 4. Backend wykonuje bulk insert
 
 **Oczekiwany rezultat**:
+
 - 5 fiszek zostaje zapisanych w tabeli `flashcards`
 - 3 fiszki mają source = `ai-full`
 - 2 fiszki mają source = `ai-edited`
@@ -328,14 +380,17 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Krytyczny
 
 #### Scenariusz 2.5: Zapis z duplikatami
+
 **Warunki wstępne**: Użytkownik ma już fiszkę z front = "Pytanie 1"
 **Kroki**:
+
 1. Użytkownik generuje nowe fiszki
 2. Jeden z kandydatów ma front = "Pytanie 1" (duplikat)
 3. Użytkownik akceptuje wszystkich kandydatów (w tym duplikat)
 4. Użytkownik klika "Zapisz zaakceptowane fiszki"
 
 **Oczekiwany rezultat**:
+
 - Duplikat nie zostaje zapisany (unique constraint: user_id + front)
 - Pozostałe fiszki zostają zapisane
 - Modal pokazuje: "Zapisano X fiszek, pominięto Y (duplikaty)"
@@ -344,13 +399,16 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Wysoki
 
 #### Scenariusz 2.6: Obsługa błędu OpenRouter (timeout)
+
 **Warunki wstępne**: OpenRouter API jest niedostępny lub nie odpowiada
 **Kroki**:
+
 1. Użytkownik wprowadza tekst źródłowy
 2. Użytkownik klika "Generuj fiszki"
 3. OpenRouter nie odpowiada przez 30s
 
 **Oczekiwany rezultat**:
+
 - System wykonuje retry (exponential backoff)
 - Po 3 nieudanych próbach zwraca błąd
 - Użytkownik widzi komunikat: "Nie udało się wygenerować fiszek. Spróbuj ponownie później."
@@ -361,13 +419,16 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ### 4.3. Zarządzanie fiszkami
 
 #### Scenariusz 3.1: Aktualizacja fiszki
+
 **Warunki wstępne**: Użytkownik jest zalogowany i ma zapisane fiszki
 **Kroki**:
+
 1. Użytkownik otwiera listę swoich fiszek (nie zaimplementowane w MVP, ale API istnieje)
 2. Użytkownik edytuje fiszkę (front: "Nowe pytanie", back: "Nowa odpowiedź")
 3. System wysyła PUT `/api/flashcards/[id]`
 
 **Oczekiwany rezultat**:
+
 - Fiszka zostaje zaktualizowana w bazie
 - `updated_at` zostaje ustawiony na aktualny czas
 - Użytkownik widzi komunikat sukcesu
@@ -375,11 +436,14 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Średni
 
 #### Scenariusz 3.2: Próba aktualizacji fiszki innego użytkownika
+
 **Warunki wstępne**: Użytkownik A jest zalogowany, istnieje fiszka należąca do użytkownika B
 **Kroki**:
+
 1. Użytkownik A wysyła PUT `/api/flashcards/[flashcard_id_B]` z nowymi danymi
 
 **Oczekiwany rezultat**:
+
 - Weryfikacja własności w `FlashcardsService.updateFlashcard()` zwraca błąd
 - Response: 404 Not Found (nie ujawniamy, że fiszka istnieje)
 - Fiszka użytkownika B nie zostaje zmodyfikowana
@@ -389,11 +453,14 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ### 4.4. Bezpieczeństwo i autoryzacja
 
 #### Scenariusz 4.1: Próba dostępu do chronionej strony bez logowania
+
 **Warunki wstępne**: Użytkownik nie jest zalogowany
 **Kroki**:
+
 1. Użytkownik próbuje otworzyć `/generate` bezpośrednio (URL)
 
 **Oczekiwany rezultat**:
+
 - Middleware wykrywa brak sesji
 - Użytkownik zostaje przekierowany na `/auth/login`
 - Query param `?redirect=/generate` jest dodawany (opcjonalnie)
@@ -401,11 +468,14 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Krytyczny
 
 #### Scenariusz 4.2: RLS - próba dostępu do danych innego użytkownika przez SQL
+
 **Warunki wstępne**: Użytkownik A jest zalogowany, istnieją dane użytkownika B
 **Kroki**:
+
 1. Użytkownik A próbuje wykonać query: `SELECT * FROM flashcards WHERE user_id = 'user_b_id'`
 
 **Oczekiwany rezultat**:
+
 - RLS blokuje query
 - Zwracany jest pusty wynik (nie błąd)
 - Użytkownik A nie widzi danych użytkownika B
@@ -413,13 +483,16 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Priorytet**: Krytyczny
 
 #### Scenariusz 4.3: XSS injection w treści fiszki
+
 **Warunki wstępne**: Użytkownik jest zalogowany
 **Kroki**:
+
 1. Użytkownik tworzy fiszkę z front = `<script>alert('XSS')</script>`
 2. Użytkownik zapisuje fiszkę
 3. Użytkownik otwiera stronę z listą fiszek
 
 **Oczekiwany rezultat**:
+
 - React automatycznie escape'uje HTML
 - Skrypt nie zostaje wykonany
 - Treść jest wyświetlana jako tekst: `<script>alert('XSS')</script>`
@@ -429,14 +502,17 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ### 4.5. Zarządzanie kontem
 
 #### Scenariusz 5.1: Usunięcie konta
+
 **Warunki wstępne**: Użytkownik jest zalogowany i ma zapisane fiszki
 **Kroki**:
+
 1. Użytkownik otwiera `/account/settings`
 2. Użytkownik klika "Usuń konto"
 3. Modal z potwierdzeniem się otwiera
 4. Użytkownik potwierdza usunięcie
 
 **Oczekiwany rezultat**:
+
 - Konto użytkownika zostaje usunięte z `auth.users`
 - Wszystkie fiszki użytkownika zostają usunięte (CASCADE)
 - Wszystkie generacje użytkownika zostają usunięte (CASCADE)
@@ -448,9 +524,11 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 5. Środowisko testowe
 
 ### 5.1. Środowisko lokalne (development)
+
 **Przeznaczenie**: Testy jednostkowe i integracyjne podczas developmentu
 
 **Konfiguracja**:
+
 - Node.js 20+
 - Supabase Local (CLI) - baza PostgreSQL w Docker
 - Migracje testowe: `20260126000000_disable_rls_for_testing.sql`, `20260126000001_create_test_user.sql`
@@ -465,9 +543,11 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
   ```
 
 ### 5.2. Środowisko testowe (staging)
+
 **Przeznaczenie**: Testy E2E, testy integracyjne z rzeczywistymi usługami
 
 **Konfiguracja**:
+
 - Dedykowany projekt Supabase (staging)
 - Mock OpenRouter API lub dedykowany klucz z limitem kosztów
 - Baza danych z seed data dla testów E2E
@@ -476,9 +556,11 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - Reset bazy danych przed każdym pełnym testem E2E (CI/CD)
 
 ### 5.3. Środowisko CI/CD (Github Actions)
+
 **Przeznaczenie**: Automatyczne uruchamianie testów przy każdym push/PR
 
 **Konfiguracja**:
+
 - Github Actions workflow: `.github/workflows/test.yml`
 - Supabase Local w kontenerze Docker
 - Uruchamianie testów jednostkowych + integracyjnych
@@ -487,7 +569,9 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - Blokowanie merge PR jeśli testy nie przechodzą
 
 ### 5.4. Dane testowe (test fixtures)
+
 **Struktura**:
+
 - `tests/fixtures/users.json` - użytkownicy testowi
 - `tests/fixtures/flashcards.json` - przykładowe fiszki
 - `tests/fixtures/generations.json` - przykładowe generacje
@@ -498,18 +582,21 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 6. Narzędzia do testowania
 
 ### 6.1. Framework testowy
+
 - **Vitest** - test runner dla testów jednostkowych i integracyjnych
   - Konfiguracja: `vitest.config.ts`
   - Szybszy niż Jest, kompatybilny z Vite/Astro
   - Wsparcie dla TypeScript out of the box
 
 ### 6.2. Testy komponentów React
+
 - **React Testing Library** - testowanie komponentów React
   - Philosophy: testowanie zachowania, nie implementacji
   - Wsparcie dla hooków przez `@testing-library/react-hooks`
 - **@testing-library/user-event** - symulacja interakcji użytkownika
 
 ### 6.3. Testy E2E
+
 - **Playwright** - automatyzacja przeglądarki
   - Konfiguracja: `playwright.config.ts`
   - Wsparcie dla wielu przeglądarek (Chromium, Firefox, WebKit)
@@ -517,28 +604,34 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
   - Parallel execution
 
 ### 6.4. Mockowanie
+
 - **MSW (Mock Service Worker)** - mockowanie API calls (OpenRouter, Supabase)
 - **vitest.mock()** - mockowanie modułów i funkcji
 
 ### 6.5. Pokrycie kodu (Code Coverage)
+
 - **Vitest Coverage** (via c8/istanbul)
   - Raport HTML: `coverage/index.html`
   - Threshold: minimum 80% dla serwisów i schematów
 
 ### 6.6. Linting i formatowanie
+
 - **ESLint** - analiza statyczna kodu
 - **Prettier** - formatowanie kodu
 - **TypeScript Compiler** - sprawdzanie typów
 
 ### 6.7. Testy dostępności (a11y)
+
 - **@axe-core/playwright** - automatyczne testy dostępności w Playwright
 - **eslint-plugin-jsx-a11y** - linting dla dostępności w JSX
 
 ### 6.8. Testy wydajnościowe
+
 - **Lighthouse CI** - audyty wydajności w CI/CD
 - **WebPageTest** - testy wydajności (manualnie)
 
 ### 6.9. Baza danych testowa
+
 - **Supabase CLI** - lokalne środowisko Supabase
   - `supabase start` - uruchomienie lokalnej instancji
   - `supabase db reset` - reset bazy do stanu początkowego
@@ -547,6 +640,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 7. Harmonogram testów
 
 ### Faza 1: Przygotowanie środowiska (Tydzień 1)
+
 - [ ] Instalacja i konfiguracja Vitest
 - [ ] Instalacja i konfiguracja React Testing Library
 - [ ] Instalacja i konfiguracja Playwright
@@ -557,6 +651,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - [ ] Setup CI/CD pipeline (Github Actions)
 
 ### Faza 2: Testy jednostkowe - warstwa serwisów (Tydzień 2)
+
 - [ ] Testy `OpenRouterService` (retry, circuit breaker, rate limiting, walidacja)
 - [ ] Testy `GenerationsService` (generateFlashcards, estimateGenerationCost)
 - [ ] Testy `FlashcardsService` (getFlashcard, updateFlashcard)
@@ -565,6 +660,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - [ ] Code coverage report - weryfikacja minimum 80%
 
 ### Faza 3: Testy jednostkowe - komponenty React (Tydzień 3)
+
 - [ ] Testy komponentów UI (Button, Input, Textarea, Dialog)
 - [ ] Testy `useGenerateFlow` hook
 - [ ] Testy `CandidateCard`, `CandidatesList` (prezentacyjne)
@@ -572,6 +668,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - [ ] Testy `EditCandidateModal`, `CommitResultModal`
 
 ### Faza 4: Testy integracyjne - API endpoints (Tydzień 4)
+
 - [ ] Setup testowej bazy Supabase z migracjami
 - [ ] Testy POST `/api/generations` (z mockowanym OpenRouter)
 - [ ] Testy GET `/api/generations/[id]`
@@ -580,12 +677,14 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - [ ] Testy middleware (auth guard, locals)
 
 ### Faza 5: Testy integracyjne - Supabase (Tydzień 5)
+
 - [ ] Testy RLS (Row Level Security) - izolacja danych użytkowników
 - [ ] Testy Auth flow (rejestracja, logowanie, reset hasła, weryfikacja email)
 - [ ] Testy concurrent requests (race conditions)
 - [ ] Testy transakcji bazodanowych
 
 ### Faza 6: Testy E2E - przepływy użytkownika (Tydzień 6-7)
+
 - [ ] Setup Playwright z różnymi przeglądarkami
 - [ ] Przepływ rejestracji i weryfikacji email
 - [ ] Przepływ logowania i wylogowania
@@ -597,6 +696,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - [ ] Testy dostępności (keyboard navigation, screen reader)
 
 ### Faza 7: Testy bezpieczeństwa (Tydzień 8)
+
 - [ ] Testy autoryzacji (próba dostępu do zasobów bez logowania)
 - [ ] Testy weryfikacji własności (próba edycji zasobów innego użytkownika)
 - [ ] Testy RLS (próba dostępu do danych innego użytkownika)
@@ -606,12 +706,14 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - [ ] Weryfikacja, że secrets nie są eksponowane
 
 ### Faza 8: Testy wydajnościowe (Tydzień 9)
+
 - [ ] Lighthouse audit - strona główna
 - [ ] Lighthouse audit - strona generowania
 - [ ] Testy czasu odpowiedzi API endpoints
 - [ ] Testy bulk operations (commit endpoint z dużą liczbą fiszek)
 
 ### Faza 9: Testy regresyjne i finalizacja (Tydzień 10)
+
 - [ ] Uruchomienie pełnego pakietu testów regresyjnych
 - [ ] Naprawa wykrytych błędów
 - [ ] Weryfikacja code coverage (minimum 80%)
@@ -619,6 +721,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - [ ] Przygotowanie raportu końcowego
 
 ### Faza 10: Ciągłe testowanie (po wdrożeniu)
+
 - [ ] Automatyczne uruchamianie testów w CI/CD przy każdym PR
 - [ ] Cotygodniowe testy regresyjne
 - [ ] Monitoring błędów w produkcji (Sentry/podobne)
@@ -627,6 +730,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 8. Kryteria akceptacji testów
 
 ### 8.1. Kryteria ilościowe
+
 - **Code coverage**: minimum 80% dla warstwy serwisów i schematów
 - **Code coverage**: minimum 70% dla komponentów React
 - **Testy jednostkowe**: minimum 3 testy na funkcję (happy path, edge case, error case)
@@ -634,6 +738,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - **Pass rate**: 100% testów musi przechodzić przed wdrożeniem
 
 ### 8.2. Kryteria jakościowe
+
 - **Testy są izolowane**: każdy test może być uruchomiony niezależnie
 - **Testy są powtarzalne**: ten sam test zawsze daje ten sam wynik
 - **Testy są szybkie**: testy jednostkowe < 100ms, integracyjne < 1s, E2E < 30s
@@ -641,6 +746,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - **Testy są maintainable**: łatwe do aktualizacji przy zmianie kodu
 
 ### 8.3. Kryteria funkcjonalne
+
 - **Bezpieczeństwo**: wszystkie testy bezpieczeństwa przechodzą (zero exploitów)
 - **Funkcjonalność**: wszystkie kluczowe funkcje działają zgodnie z wymaganiami
 - **Stabilność**: brak błędów krytycznych i blokujących
@@ -648,6 +754,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - **Dostępność**: podstawowe wymogi a11y są spełnione (keyboard navigation, semantic HTML)
 
 ### 8.4. Kryteria gotowości do produkcji
+
 - [ ] Wszystkie testy jednostkowe przechodzą (100%)
 - [ ] Wszystkie testy integracyjne przechodzą (100%)
 - [ ] Wszystkie testy E2E przechodzą (100%)
@@ -662,7 +769,9 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 9. Role i odpowiedzialności w procesie testowania
 
 ### 9.1. QA Engineer (Lead)
+
 **Odpowiedzialności**:
+
 - Tworzenie i utrzymywanie strategii testowania
 - Projektowanie scenariuszy testowych
 - Pisanie testów E2E (Playwright)
@@ -674,7 +783,9 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Osoba**: [Do przypisania]
 
 ### 9.2. Frontend Developer
+
 **Odpowiedzialności**:
+
 - Pisanie testów jednostkowych dla komponentów React
 - Pisanie testów dla hooków (useGenerateFlow)
 - Pisanie testów dla schematów walidacji (Zod)
@@ -684,7 +795,9 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Osoba**: [Do przypisania]
 
 ### 9.3. Backend Developer
+
 **Odpowiedzialności**:
+
 - Pisanie testów jednostkowych dla serwisów
 - Pisanie testów integracyjnych dla API endpoints
 - Pisanie testów dla middleware
@@ -695,7 +808,9 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Osoba**: [Do przypisania]
 
 ### 9.4. DevOps Engineer
+
 **Odpowiedzialności**:
+
 - Konfiguracja CI/CD pipeline (Github Actions)
 - Setup środowiska testowego (staging)
 - Konfiguracja Supabase Local w CI/CD
@@ -706,7 +821,9 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Osoba**: [Do przypisania]
 
 ### 9.5. Product Owner
+
 **Odpowiedzialności**:
+
 - Definiowanie kryteriów akceptacji
 - Priorytetyzacja testów (co jest najważniejsze)
 - Akceptacja wyników testów
@@ -715,7 +832,9 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Osoba**: [Do przypisania]
 
 ### 9.6. Security Specialist (opcjonalnie)
+
 **Odpowiedzialności**:
+
 - Przeprowadzenie testów bezpieczeństwa
 - Audyt RLS i autoryzacji
 - Testy penetracyjne (opcjonalnie)
@@ -726,9 +845,11 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ## 10. Procedury raportowania błędów
 
 ### 10.1. Narzędzie do śledzenia błędów
+
 **Github Issues** - wszystkie błędy są raportowane jako Issues w repozytorium
 
 **Labele**:
+
 - `bug` - błąd funkcjonalny
 - `security` - błąd bezpieczeństwa
 - `performance` - problem wydajnościowy
@@ -743,54 +864,66 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 
 ```markdown
 ## Opis błędu
+
 [Krótki opis problemu]
 
 ## Środowisko
+
 - **Typ testu**: [Jednostkowy / Integracyjny / E2E]
 - **Środowisko**: [Local / Staging / CI/CD]
 - **Przeglądarka** (dla E2E): [Chrome 120 / Firefox 121 / Safari 17]
 - **System operacyjny**: [Windows 11 / macOS 14 / Linux]
 
 ## Kroki do reprodukcji
+
 1. [Krok 1]
 2. [Krok 2]
 3. [Krok 3]
 
 ## Oczekiwany rezultat
+
 [Co powinno się stać]
 
 ## Rzeczywisty rezultat
+
 [Co się faktycznie stało]
 
 ## Logi/Screenshot
+
 [Załączenie logów lub screenshotów]
 
 ## Priorytet
+
 [Critical / High / Medium / Low]
 
 ## Dodatkowe informacje
+
 [Wszelkie inne istotne informacje]
 ```
 
 ### 10.3. Proces obsługi błędów
 
 #### Krok 1: Wykrycie błędu
+
 - Test nie przechodzi w lokalnym środowisku, staging lub CI/CD
 - QA lub developer wykrywa błąd manualnie
 
 #### Krok 2: Raportowanie
+
 - Utworzenie Github Issue według szablonu
 - Przypisanie odpowiednich labeli (bug, priorytet)
 - Przypisanie do odpowiedniej osoby (jeśli wiadomo kto powinien naprawić)
 - Dodanie do Project Board (opcjonalnie)
 
 #### Krok 3: Triaging
+
 - Product Owner / Tech Lead przegląda błędy
 - Weryfikacja priorytetu
 - Decyzja czy blokuje wdrożenie (critical)
 - Przypisanie do sprintu (jeśli stosujemy Scrum)
 
 #### Krok 4: Naprawa
+
 - Developer przejmuje Issue
 - Tworzy branch: `fix/issue-123-short-description`
 - Naprawia błąd
@@ -798,12 +931,14 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - Tworzy Pull Request z referencją do Issue (#123)
 
 #### Krok 5: Weryfikacja
+
 - Code review przez innego developera
 - Testy automatyczne w CI/CD muszą przejść
 - QA weryfikuje naprawę (jeśli to możliwe)
 - Merge do main/develop
 
 #### Krok 6: Zamknięcie
+
 - Issue zostaje zamknięty automatycznie (jeśli PR zawiera "Fixes #123")
 - Weryfikacja w środowisku staging
 - Uwzględnienie w release notes
@@ -813,6 +948,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 **Błąd krytyczny** = blokuje kluczową funkcjonalność lub stanowi zagrożenie bezpieczeństwa
 
 **Procedura**:
+
 1. **Natychmiastowe powiadomienie**: Slack/Discord/Email do całego zespołu
 2. **Oznaczenie**: Label `critical` + `security` (jeśli dotyczy)
 3. **Priorytet 0**: Przerywamy bieżące prace, skupiamy się na naprawie
@@ -823,6 +959,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 ### 10.5. Metryki błędów
 
 **Śledzenie**:
+
 - Liczba błędów wykrytych (per tydzień/sprint)
 - Liczba błędów naprawionych (per tydzień/sprint)
 - Średni czas naprawy (Time to Resolution)
@@ -830,6 +967,7 @@ SmartFlash to aplikacja webowa umożliwiająca użytkownikom generowanie fiszek 
 - Liczba błędów wykrytych w produkcji (ideał: 0)
 
 **Raportowanie**:
+
 - Cotygodniowy raport dla zespołu
 - Comiesięczny raport dla stakeholderów
 

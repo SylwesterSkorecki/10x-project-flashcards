@@ -10,7 +10,7 @@ vi.mock("@/lib/services/openrouter.service", () => {
     this.defaultModel = "anthropic/claude-3.5-sonnet";
     return this;
   });
-  
+
   return {
     OpenRouterService: MockOpenRouterService,
   };
@@ -406,9 +406,7 @@ describe("GenerationsService", () => {
 
       expect(result.estimatedPromptTokens).toBeGreaterThan(0);
       expect(result.estimatedCompletionTokens).toBe(1000);
-      expect(result.estimatedTotalTokens).toBe(
-        result.estimatedPromptTokens + result.estimatedCompletionTokens
-      );
+      expect(result.estimatedTotalTokens).toBe(result.estimatedPromptTokens + result.estimatedCompletionTokens);
     });
 
     it("should calculate tokens based on 2.5 chars per token for Polish", () => {
@@ -494,9 +492,7 @@ describe("GenerationsService", () => {
         max_candidates: 8,
       };
 
-      await expect(service.generateFlashcards(userId, command)).rejects.toThrow(
-        "Source text cannot be empty"
-      );
+      await expect(service.generateFlashcards(userId, command)).rejects.toThrow("Source text cannot be empty");
     });
 
     it("should throw error for whitespace-only source text", async () => {
@@ -505,9 +501,7 @@ describe("GenerationsService", () => {
         max_candidates: 8,
       };
 
-      await expect(service.generateFlashcards(userId, command)).rejects.toThrow(
-        "Source text cannot be empty"
-      );
+      await expect(service.generateFlashcards(userId, command)).rejects.toThrow("Source text cannot be empty");
     });
 
     it("should throw error for source text shorter than 1000 characters", async () => {
@@ -691,9 +685,7 @@ describe("GenerationsService", () => {
     };
 
     it("should transform validation error to user-friendly message", async () => {
-      mockOpenRouter.sendChatMessage.mockRejectedValue(
-        new Error("Response validation failed: invalid format")
-      );
+      mockOpenRouter.sendChatMessage.mockRejectedValue(new Error("Response validation failed: invalid format"));
 
       await expect(service.generateFlashcards(userId, validCommand)).rejects.toThrow(
         "AI model returned invalid response format. Please try again."
@@ -803,9 +795,7 @@ describe("GenerationsService", () => {
       const originalError = new Error("Original error message");
       mockOpenRouter.sendChatMessage.mockRejectedValue(originalError);
 
-      await expect(service.generateFlashcards(userId, validCommand)).rejects.toThrow(
-        "Original error message"
-      );
+      await expect(service.generateFlashcards(userId, validCommand)).rejects.toThrow("Original error message");
     });
   });
 
@@ -826,7 +816,7 @@ describe("GenerationsService", () => {
         content: JSON.stringify({
           flashcards: [
             { front: "Q1", back: "A1", score: 0.95 },
-            { front: "Q2", back: "A2", score: 0.90 },
+            { front: "Q2", back: "A2", score: 0.9 },
             { front: "Q3", back: "A3", score: 0.85 },
           ],
         }),

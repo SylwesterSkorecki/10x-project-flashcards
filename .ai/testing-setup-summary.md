@@ -7,6 +7,7 @@
 ### Zainstalowane Zależności
 
 #### Vitest (Unit & Integration Tests)
+
 - `vitest` - Test runner
 - `@vitest/ui` - Interaktywny interfejs testowy
 - `@vitest/coverage-v8` - Raportowanie pokrycia kodu
@@ -17,10 +18,12 @@
 - `@vitejs/plugin-react` - Plugin React dla Vite
 
 #### Playwright (E2E Tests)
+
 - `@playwright/test` - Framework do testów E2E
 - Chromium browser - Zainstalowany i gotowy do użycia
 
 #### MSW (API Mocking)
+
 - `msw` - Mock Service Worker dla mockowania API
 
 ### Stworzone Pliki Konfiguracyjne
@@ -78,6 +81,7 @@ tests/
 ### Stan Testów
 
 #### Testy Jednostkowe (Vitest)
+
 ✅ **13 testów przechodzi pomyślnie**
 
 ```
@@ -102,6 +106,7 @@ tests/
 ```
 
 #### Testy E2E (Playwright)
+
 ✅ Środowisko skonfigurowane i gotowe do użycia
 
 **Uwaga**: Testy E2E wymagają uruchomionego serwera deweloperskiego (`npm run dev`)
@@ -127,6 +132,7 @@ MSW jest skonfigurowany do przechwytywania następujących endpointów:
 ### Aktualizacje w .gitignore
 
 Dodano ignorowanie plików testowych:
+
 ```
 coverage/
 .vitest/
@@ -138,6 +144,7 @@ playwright/.cache/
 ## Następne Kroki
 
 ### 1. Uruchom Testy
+
 ```bash
 npm test              # Wszystkie testy jednostkowe
 npm run test:watch    # Tryb watch
@@ -146,6 +153,7 @@ npm run test:watch    # Tryb watch
 ### 2. Napisz Własne Testy
 
 Przykłady znajdują się w:
+
 - `src/__tests__/components/Button.test.tsx`
 - `tests/unit/api-client.test.ts`
 - `tests/e2e/example.spec.ts`
@@ -153,6 +161,7 @@ Przykłady znajdują się w:
 ### 3. Skonfiguruj CI/CD
 
 Użyj przykładowego pliku:
+
 ```bash
 cp .github/workflows/tests.yml.example .github/workflows/tests.yml
 ```
@@ -167,6 +176,7 @@ npm run test:coverage
 ## Wskazówki
 
 ### Podczas Rozwoju
+
 ```bash
 # Uruchom testy w trybie watch
 npm run test:watch
@@ -176,6 +186,7 @@ npm run test:ui
 ```
 
 ### Przed Commitem
+
 ```bash
 # Uruchom wszystkie testy
 npm test -- --run
@@ -185,6 +196,7 @@ npm run test:coverage
 ```
 
 ### Debugowanie
+
 ```bash
 # Vitest - konkretny plik
 npx vitest src/__tests__/components/Button.test.tsx

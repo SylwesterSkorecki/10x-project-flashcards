@@ -9,12 +9,14 @@ Ten dokument opisuje konfigurację CI/CD dla projektu z wykorzystaniem GitHub Ac
 **Status**: Aktywny i gotowy do użycia
 
 **Co robi**:
+
 - Uruchamia się przy każdym push i pull request
 - Sprawdza kod linterem
 - Buduje projekt
 - Uruchamia testy jednostkowe
 
 **Kiedy się uruchamia**:
+
 - Push na branch: `main`, `master`, `develop`, `feature/**`
 - Pull Request do: `main`, `master`, `develop`
 
@@ -25,6 +27,7 @@ Ten dokument opisuje konfigurację CI/CD dla projektu z wykorzystaniem GitHub Ac
 **Status**: Przykład do aktywacji w przyszłości
 
 **Co robi dodatkowo**:
+
 - Dzieli zadania na osobne joby (lint, testy, build, e2e)
 - Generuje raporty coverage
 - Uruchamia testy E2E z Playwright
@@ -46,6 +49,7 @@ Ten dokument opisuje konfigurację CI/CD dla projektu z wykorzystaniem GitHub Ac
 ### Kiedy workflow NIE przejdzie
 
 Workflow zakończy się błędem jeśli:
+
 - ❌ Linter wykryje błędy w kodzie
 - ❌ Build się nie powiedzie
 - ❌ Którykolwiek test jednostkowy nie przejdzie
@@ -124,7 +128,8 @@ npm run test:e2e
 
 ### Problem: Workflow nie uruchamia się
 
-**Rozwiązanie**: 
+**Rozwiązanie**:
+
 - Sprawdź czy plik jest w `.github/workflows/`
 - Upewnij się że ma rozszerzenie `.yml` (nie `.example`)
 - Sprawdź czy jesteś na właściwym branchu
@@ -132,6 +137,7 @@ npm run test:e2e
 ### Problem: Testy E2E nie działają
 
 **Rozwiązanie**:
+
 - Sprawdź czy dodałeś secrets w GitHub
 - Upewnij się że nazwy secrets są poprawne
 - Sprawdź logi Playwright w Actions
@@ -139,6 +145,7 @@ npm run test:e2e
 ### Problem: Build trwa bardzo długo
 
 **Rozwiązanie**:
+
 - Używamy `npm ci` (szybsze niż `npm install`)
 - Cache dla node_modules jest włączony
 - Czas: 2-3 min dla podstawowego, 5-7 min dla zaawansowanego
