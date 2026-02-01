@@ -27,6 +27,11 @@
   - Supabase (PostgreSQL, Auth, SDK)
 - **AI Integration**
   - Openrouter.ai (multi-model gateway, cost limits)
+- **Testing**
+  - Vitest (unit & integration tests)
+  - React Testing Library (component tests)
+  - Playwright (E2E tests)
+  - MSW (API mocking)
 - **CI/CD & Hosting**
   - GitHub Actions
   - DigitalOcean (Docker deployment)
@@ -88,14 +93,31 @@ npm run preview
 All commands assume you’re in the project root:
 
 ```bash
-npm run dev       # Start Astro dev server
-npm run build     # Build for production
-npm run preview   # Preview production build
-npm run astro     # Run Astro CLI
-npm run lint      # Run ESLint
-npm run lint:fix  # Run ESLint with auto-fix
-npm run format    # Format code with Prettier
+# Development
+npm run dev          # Start Astro dev server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run astro        # Run Astro CLI
+
+# Code Quality
+npm run lint         # Run ESLint
+npm run lint:fix     # Run ESLint with auto-fix
+npm run format       # Format code with Prettier
+
+# Unit & Integration Tests (Vitest)
+npm run test              # Run all unit tests once
+npm run test:watch        # Run tests in watch mode (recommended)
+npm run test:ui           # Run tests with interactive UI
+npm run test:coverage     # Run tests with coverage report
+
+# E2E Tests (Playwright)
+npm run test:e2e          # Run E2E tests
+npm run test:e2e:ui       # Run E2E tests with Playwright UI
+npm run test:e2e:debug    # Run E2E tests in debug mode
+npm run test:e2e:report   # View last E2E test report
 ```
+
+**For detailed testing documentation, see [tests/README.md](./tests/README.md)**
 
 ---
 
