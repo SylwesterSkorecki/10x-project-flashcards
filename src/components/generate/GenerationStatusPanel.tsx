@@ -11,12 +11,7 @@ interface GenerationStatusPanelProps {
   onCancel: () => void;
 }
 
-export function GenerationStatusPanel({
-  status,
-  generationId,
-  error,
-  onCancel,
-}: GenerationStatusPanelProps) {
+export function GenerationStatusPanel({ status, generationId, error, onCancel }: GenerationStatusPanelProps) {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [startTime] = useState(() => Date.now());
 
@@ -101,10 +96,7 @@ export function GenerationStatusPanel({
 
   return (
     <div
-      className={cn(
-        "relative p-6 rounded-lg border transition-all",
-        config.color
-      )}
+      className={cn("relative p-6 rounded-lg border transition-all", config.color)}
       role="status"
       aria-live="polite"
       aria-atomic="true"
@@ -121,9 +113,7 @@ export function GenerationStatusPanel({
           {/* Generation ID and elapsed time */}
           {(status === "pending" || status === "polling") && (
             <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-              {generationId && (
-                <span className="font-mono">ID: {generationId.substring(0, 8)}...</span>
-              )}
+              {generationId && <span className="font-mono">ID: {generationId.substring(0, 8)}...</span>}
               <span className="flex items-center gap-1">
                 <Clock className="size-3" />
                 {formatTime(elapsedTime)}
@@ -134,13 +124,7 @@ export function GenerationStatusPanel({
 
         {/* Cancel button */}
         {config.showCancel && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onCancel}
-            className="flex-shrink-0"
-            aria-label="Cancel generation"
-          >
+          <Button variant="ghost" size="sm" onClick={onCancel} className="flex-shrink-0" aria-label="Cancel generation">
             <X />
             Cancel
           </Button>

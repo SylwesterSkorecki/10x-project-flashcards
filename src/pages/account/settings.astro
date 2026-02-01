@@ -1,0 +1,33 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { Navigation } from "@/components/layout/Navigation";
+import { AccountSettings } from "@/components/account/AccountSettings";
+
+// TODO: Implement auth guard
+// const supabase = Astro.locals.supabase;
+// const { data: { user }, error } = await supabase.auth.getUser();
+//
+// if (!user || error) {
+//   const returnTo = encodeURIComponent("/account/settings");
+//   return Astro.redirect(`/auth/login?returnTo=${returnTo}`);
+// }
+
+// Mock user data for UI demonstration
+const mockUser = {
+  email: "user@example.com",
+  created_at: new Date().toISOString(),
+};
+
+// TODO: Replace with actual user data
+const userEmail = mockUser.email;
+const createdAt = mockUser.created_at;
+const isAuthenticated = true;
+---
+
+<Layout title="Ustawienia konta - SmartFlash">
+  <Navigation client:load isAuthenticated={isAuthenticated} userEmail={userEmail} />
+
+  <div class="min-h-screen bg-muted/30 py-12 px-4">
+    <AccountSettings client:load userEmail={userEmail} createdAt={createdAt} />
+  </div>
+</Layout>

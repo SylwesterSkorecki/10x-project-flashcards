@@ -160,6 +160,21 @@ Manualne tworzenie fiszek jest czasochłonne i monotonny proces, co prowadzi do 
   - Użytkownik ocenia zgodnie z oczekiwaniami algorytmu na ile przyswoił fiszkę,
   - Następnie algorytm pokazuje kolejną fiszkę w ramach sesji nauki
 
+  ## US-004: Bezpieczny dostęp i uwierzytelnianie
+
+- ID: US-018
+  Tytuł: Bezpieczny dostęp
+  Opis: Jako użytkownik chcę mieć możliwość rejestracji i logowania się do systemu w sposób zapewniający bezpieczeństwo moich danych.
+  Kryteria akceptacji:
+  - Logowanie i rejestracja odbywają się na dedykowanych stronach.
+  - Logowanie wymaga podania adresu email i hasła.
+  - Nie ma możliwości dostępu do aplikacji bez zalogowania.
+  - Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
+  - Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+  - Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
+  - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+  - Odzyskiwanie hasła powinno być możliwe.
+
 ## 6. Metryki sukcesu
 
 1. Efektywność generowania fiszek:

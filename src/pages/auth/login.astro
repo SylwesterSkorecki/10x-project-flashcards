@@ -1,0 +1,57 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { LoginForm } from "@/components/auth/LoginForm";
+
+// Get returnTo parameter from URL
+const returnTo = Astro.url.searchParams.get("returnTo");
+const message = Astro.url.searchParams.get("message");
+
+// Check if user is already logged in (from middleware)
+const user = Astro.locals.user;
+
+if (user) {
+  // User is already authenticated, redirect to destination
+  const redirectUrl = returnTo || "/generate";
+  return Astro.redirect(redirectUrl);
+}
+
+// Map message codes to user-friendly messages
+const messages: Record<string, string> = {
+  logged_out: "Zostałeś wylogowany",
+  password_reset_success: "Hasło zostało zmienione. Możesz się teraz zalogować.",
+  email_verified: "Email został zweryfikowany. Możesz się teraz zalogować.",
+  account_deleted: "Twoje konto zostało usunięte",
+};
+
+const statusMessage = message ? messages[message] : null;
+---
+
+<Layout title="Zaloguj się - SmartFlash">
+  <div class="min-h-screen flex items-center justify-center bg-muted/30 py-12 px-4">
+    {
+      statusMessage && (
+        <div class="fixed top-4 right-4 p-4 rounded-md bg-primary/10 border border-primary/20 shadow-lg max-w-md">
+          <p class="text-sm text-primary">{statusMessage}</p>
+        </div>
+      )
+    }
+    <LoginForm client:load returnTo={returnTo ?? undefined} />
+  </div>
+</Layout>
+
+<style>
+  .fixed {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

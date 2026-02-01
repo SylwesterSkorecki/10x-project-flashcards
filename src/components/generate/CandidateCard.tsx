@@ -12,13 +12,7 @@ interface CandidateCardProps {
   onReject: (candidateId: string) => void;
 }
 
-export function CandidateCard({
-  candidate,
-  onAccept,
-  onUnaccept,
-  onEdit,
-  onReject,
-}: CandidateCardProps) {
+export function CandidateCard({ candidate, onAccept, onUnaccept, onEdit, onReject }: CandidateCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isAccepted = candidate.status === "accepted" || candidate.status === "edited";
   const isEdited = candidate.status === "edited";
@@ -64,9 +58,7 @@ export function CandidateCard({
             )}
           >
             <Star className={cn("size-3", getScoreColor(candidate.score))} />
-            <span className={getScoreColor(candidate.score)}>
-              {(candidate.score * 100).toFixed(0)}%
-            </span>
+            <span className={getScoreColor(candidate.score)}>{(candidate.score * 100).toFixed(0)}%</span>
           </div>
 
           {/* Edited badge */}
@@ -117,9 +109,7 @@ export function CandidateCard({
 
       {/* Front (Question) */}
       <div className="space-y-1">
-        <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Front (Question)
-        </h4>
+        <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Front (Question)</h4>
         <p className="text-sm leading-relaxed">{candidate.front}</p>
       </div>
 
@@ -129,15 +119,8 @@ export function CandidateCard({
       {/* Back (Answer) - Expandable */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Back (Answer)
-          </h4>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="h-6 px-2 text-xs"
-          >
+          <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Back (Answer)</h4>
+          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="h-6 px-2 text-xs">
             {isExpanded ? (
               <>
                 <ChevronUp className="size-3" />
@@ -151,20 +134,11 @@ export function CandidateCard({
             )}
           </Button>
         </div>
-        <p
-          className={cn(
-            "text-sm leading-relaxed transition-all",
-            !isExpanded && "line-clamp-2"
-          )}
-        >
-          {candidate.back}
-        </p>
+        <p className={cn("text-sm leading-relaxed transition-all", !isExpanded && "line-clamp-2")}>{candidate.back}</p>
       </div>
 
       {/* Accepted indicator */}
-      {isAccepted && (
-        <div className="absolute top-2 left-2 size-3 rounded-full bg-green-500" aria-hidden="true" />
-      )}
+      {isAccepted && <div className="absolute top-2 left-2 size-3 rounded-full bg-green-500" aria-hidden="true" />}
     </div>
   );
 }

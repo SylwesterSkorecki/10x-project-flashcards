@@ -62,7 +62,7 @@ export function useGenerateFlow(): UseGenerateFlowReturn {
     },
     onSuccess: (response) => {
       setError(null);
-      
+
       // Check if sync (200) or async (202)
       if ("candidates" in response) {
         // Synchronous response with candidates
@@ -102,10 +102,7 @@ export function useGenerateFlow(): UseGenerateFlowReturn {
     enabled: status === "polling" && !!generationId,
     refetchInterval: (query) => {
       // Stop polling if we have candidates or exceeded max attempts
-      if (
-        query.state.data?.candidates ||
-        pollingAttemptsRef.current >= MAX_POLLING_ATTEMPTS
-      ) {
+      if (query.state.data?.candidates || pollingAttemptsRef.current >= MAX_POLLING_ATTEMPTS) {
         return false;
       }
       return POLLING_INTERVAL;
@@ -142,7 +139,7 @@ export function useGenerateFlow(): UseGenerateFlowReturn {
     onSuccess: (result) => {
       // Invalidate flashcards cache
       queryClient.invalidateQueries({ queryKey: ["flashcards"] });
-      
+
       // Show success toast
       if (result.saved.length > 0 && result.skipped.length === 0) {
         toast.success(`Saved ${result.saved.length} flashcard${result.saved.length !== 1 ? "s" : ""}`);
@@ -188,21 +185,13 @@ export function useGenerateFlow(): UseGenerateFlowReturn {
 
   const acceptCandidate = useCallback((candidateId: string) => {
     setCandidates((prev) =>
-      prev.map((c) =>
-        c.candidate_id === candidateId
-          ? { ...c, status: "accepted" as const }
-          : c
-      )
+      prev.map((c) => (c.candidate_id === candidateId ? { ...c, status: "accepted" as const } : c))
     );
   }, []);
 
   const unacceptCandidate = useCallback((candidateId: string) => {
     setCandidates((prev) =>
-      prev.map((c) =>
-        c.candidate_id === candidateId
-          ? { ...c, status: "pending" as const }
-          : c
-      )
+      prev.map((c) => (c.candidate_id === candidateId ? { ...c, status: "pending" as const } : c))
     );
   }, []);
 
@@ -218,18 +207,12 @@ export function useGenerateFlow(): UseGenerateFlowReturn {
 
   const rejectCandidate = useCallback((candidateId: string) => {
     setCandidates((prev) =>
-      prev.map((c) =>
-        c.candidate_id === candidateId
-          ? { ...c, status: "rejected" as const }
-          : c
-      )
+      prev.map((c) => (c.candidate_id === candidateId ? { ...c, status: "rejected" as const } : c))
     );
   }, []);
 
   const commitAccepted = useCallback(async (): Promise<BulkSaveResult | null> => {
-    const accepted = candidates.filter(
-      (c) => c.status === "accepted" || c.status === "edited"
-    );
+    const accepted = candidates.filter((c) => c.status === "accepted" || c.status === "edited");
 
     if (accepted.length === 0) {
       setError("No candidates accepted");
@@ -252,7 +235,7 @@ export function useGenerateFlow(): UseGenerateFlowReturn {
   // Error handler
   const handleError = (err: unknown) => {
     let errorMessage = "An unexpected error occurred";
-    
+
     if (err instanceof ApiClientError) {
       if (err.isRateLimitError()) {
         errorMessage = "Rate limit exceeded. Please try again later.";
@@ -285,14 +268,12 @@ export function useGenerateFlow(): UseGenerateFlowReturn {
     } else {
       toast.error(errorMessage);
     }
-    
+
     setError(errorMessage);
   };
 
   // Computed values
-  const acceptedCandidates = candidates.filter(
-    (c) => c.status === "accepted" || c.status === "edited"
-  );
+  const acceptedCandidates = candidates.filter((c) => c.status === "accepted" || c.status === "edited");
   const acceptedCount = acceptedCandidates.length;
 
   return {

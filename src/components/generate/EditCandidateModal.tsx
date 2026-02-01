@@ -25,12 +25,7 @@ interface EditCandidateModalProps {
 const MAX_FRONT_LENGTH = 200;
 const MAX_BACK_LENGTH = 500;
 
-export function EditCandidateModal({
-  candidate,
-  isOpen,
-  onClose,
-  onSave,
-}: EditCandidateModalProps) {
+export function EditCandidateModal({ candidate, isOpen, onClose, onSave }: EditCandidateModalProps) {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
   const [frontError, setFrontError] = useState<string | null>(null);
@@ -164,11 +159,7 @@ export function EditCandidateModal({
             />
             <div className="flex items-center justify-between gap-2">
               {frontError ? (
-                <p
-                  id={frontErrorId}
-                  role="alert"
-                  className="text-sm text-destructive flex items-center gap-1"
-                >
+                <p id={frontErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
                   <AlertCircle className="size-3" />
                   {frontError}
                 </p>
@@ -202,19 +193,12 @@ export function EditCandidateModal({
               placeholder="Enter the answer or explanation"
               aria-invalid={!!backError}
               aria-describedby={backError ? backErrorId : undefined}
-              className={cn(
-                "min-h-[120px] resize-y",
-                backError && "border-destructive focus-visible:ring-destructive"
-              )}
+              className={cn("min-h-[120px] resize-y", backError && "border-destructive focus-visible:ring-destructive")}
               maxLength={MAX_BACK_LENGTH}
             />
             <div className="flex items-center justify-between gap-2">
               {backError ? (
-                <p
-                  id={backErrorId}
-                  role="alert"
-                  className="text-sm text-destructive flex items-center gap-1"
-                >
+                <p id={backErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
                   <AlertCircle className="size-3" />
                   {backError}
                 </p>
@@ -236,8 +220,7 @@ export function EditCandidateModal({
           {/* Keyboard shortcut hint */}
           <p className="text-xs text-muted-foreground">
             Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground border">Cmd</kbd> +{" "}
-            <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground border">Enter</kbd> to
-            save
+            <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground border">Enter</kbd> to save
           </p>
         </div>
 

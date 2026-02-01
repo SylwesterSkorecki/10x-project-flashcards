@@ -1,0 +1,112 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+
+// Email verification is handled automatically by Supabase when user clicks the link
+// The link contains a token that Supabase processes on the backend
+// After clicking the link, user is redirected here with a session or error
+
+const supabase = Astro.locals.supabase;
+const { data: { user }, error } = await supabase.auth.getUser();
+
+let status: "success" | "error" | "already_verified" = "success";
+let message = "Twój email został zweryfikowany! Możesz się teraz zalogować.";
+
+if (error || !user) {
+  // No valid session - either token expired or invalid
+  status = "error";
+  message = "Link weryfikacyjny jest nieprawidłowy lub wygasł. Zarejestruj się ponownie.";
+} else if (user.email_confirmed_at) {
+  // User has confirmed email - check if it was just confirmed or already confirmed before
+  const confirmedDate = new Date(user.email_confirmed_at);
+  const now = new Date();
+  const diffMinutes = (now.getTime() - confirmedDate.getTime()) / (1000 * 60);
+  
+  if (diffMinutes < 5) {
+    // Just confirmed (less than 5 minutes ago)
+    status = "success";
+    message = "Twój email został zweryfikowany! Możesz się teraz zalogować.";
+  } else {
+    // Already verified before
+    status = "already_verified";
+    message = "Twój email został już wcześniej zweryfikowany. Możesz się zalogować.";
+  }
+} else {
+  // Edge case: user exists but email not confirmed yet
+  status = "error";
+  message = "Email nie został jeszcze zweryfikowany. Sprawdź swoją skrzynkę pocztową.";
+}
+
+const redirectUrl =
+  status === "success"
+    ? "/auth/login?message=email_verified"
+    : "/auth/login";
+---
+
+<Layout title="Weryfikacja emaila - SmartFlash">
+  <div class="min-h-screen flex items-center justify-center bg-muted/30 py-12 px-4">
+    <div class="w-full max-w-md mx-auto p-6 space-y-6 bg-background rounded-lg border shadow-sm">
+      {
+        status === "success" && (
+          <div class="text-center space-y-4">
+            <div class="flex justify-center">
+              <CheckCircle2 className="size-16 text-green-500" />
+            </div>
+            <div class="space-y-2">
+              <h1 class="text-2xl font-bold">Email zweryfikowany!</h1>
+              <p class="text-muted-foreground">{message}</p>
+              <p class="text-sm text-muted-foreground">
+                Przekierowujemy Cię do strony logowania...
+              </p>
+            </div>
+          </div>
+        )
+      }
+
+      {
+        status === "already_verified" && (
+          <div class="text-center space-y-4">
+            <div class="flex justify-center">
+              <AlertCircle className="size-16 text-primary" />
+            </div>
+            <div class="space-y-2">
+              <h1 class="text-2xl font-bold">Email już zweryfikowany</h1>
+              <p class="text-muted-foreground">{message}</p>
+            </div>
+            <Button asChild className="mt-4">
+              <a href="/auth/login">Przejdź do logowania</a>
+            </Button>
+          </div>
+        )
+      }
+
+      {
+        status === "error" && (
+          <div class="text-center space-y-4">
+            <div class="flex justify-center">
+              <XCircle className="size-16 text-destructive" />
+            </div>
+            <div class="space-y-2">
+              <h1 class="text-2xl font-bold">Błąd weryfikacji</h1>
+              <p class="text-muted-foreground">{message}</p>
+            </div>
+            <Button asChild className="mt-4">
+              <a href="/auth/register">Zarejestruj się ponownie</a>
+            </Button>
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    status === "success" && (
+      <script define:vars={{ redirectUrl }}>
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 3000);
+      </script>
+    )
+  }
+</Layout>

@@ -1,54 +1,48 @@
 import type { APIRoute } from "astro";
-import type { GenerationDTO } from "@/types";
-
-// ============================================
-// DEMO MODE - Mock GET Generation Endpoint
-// ============================================
-// This endpoint is for polling in async mode
-// In demo mode, we use sync responses, so this is rarely called
+import { createErrorResponse } from "@/lib/helpers/api-error";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
-  const generationId = params.id;
-  
-  if (!generationId) {
-    return new Response(
-      JSON.stringify({
-        error: {
-          code: "validation_error",
-          message: "generation_id is required",
-        },
-      }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+/**
+ * GET /api/generations/{id}
+ * Retrieves a generation by ID for the authenticated user
+ * Note: Currently not used in sync flow, but important for async/polling mode
+ */
+export const GET: APIRoute = async ({ params, locals }) => {
+  // Step 1: Verify authentication
+  const supabase = locals.supabase;
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return createErrorResponse("unauthorized", "Wymagana autoryzacja", 401);
   }
 
-  // Mock generation data (in real implementation, fetch from database)
-  const mockGeneration: GenerationDTO = {
-    id: generationId,
-    user_id: "mock-user-123",
-    model: "mock-model-v1",
-    source_text_length: 2500,
-    generated_count: 5,
-    accepted_unedited_count: 0,
-    accepted_edited_count: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    candidates: [
-      {
-        candidate_id: "mock-1",
-        front: "What is a mock question?",
-        back: "A mock question is a sample question used for testing purposes.",
-        score: 0.9,
-      },
-    ],
-  };
+  const userId = user.id;
 
-  return new Response(JSON.stringify(mockGeneration), {
+  // Step 2: Validate generation ID
+  const generationId = params.id;
+
+  if (!generationId) {
+    return createErrorResponse("validation_error", "ID generacji jest wymagane", 400);
+  }
+
+  // Step 3: Fetch generation from database (must belong to current user)
+  const { data: generation, error } = await supabase
+    .from("generations")
+    .select("*")
+    .eq("id", generationId)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !generation) {
+    return createErrorResponse("not_found", "Generacja nie została znaleziona", 404);
+  }
+
+  // Step 4: Return generation data
+  return new Response(JSON.stringify(generation), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });

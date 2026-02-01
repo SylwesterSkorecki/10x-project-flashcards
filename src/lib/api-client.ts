@@ -10,12 +10,9 @@ export class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -26,12 +23,7 @@ export class ApiClient {
 
     if (!response.ok) {
       const errorData = (await response.json()) as ApiError;
-      throw new ApiClientError(
-        errorData.error.message,
-        response.status,
-        errorData.error.code,
-        errorData.error.details
-      );
+      throw new ApiClientError(errorData.error.message, response.status, errorData.error.code, errorData.error.details);
     }
 
     return response.json() as Promise<T>;

@@ -9,12 +9,7 @@ interface GenerateButtonProps {
 
 export function GenerateButton({ onClick, disabled, isLoading }: GenerateButtonProps) {
   return (
-    <Button
-      onClick={onClick}
-      disabled={disabled || isLoading}
-      size="lg"
-      className="w-full sm:w-auto"
-    >
+    <Button onClick={onClick} disabled={disabled || isLoading} size="lg" className="w-full sm:w-auto">
       {isLoading ? (
         <>
           <Loader2 className="animate-spin" />

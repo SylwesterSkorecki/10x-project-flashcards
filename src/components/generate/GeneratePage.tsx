@@ -83,9 +83,7 @@ function GeneratePageContent() {
 
   const showCandidates = status === "success" && candidates.length > 0;
   const isDisabled = isGenerating || isPolling;
-  const editingCandidate = editingCandidateId
-    ? candidates.find((c) => c.candidate_id === editingCandidateId)
-    : null;
+  const editingCandidate = editingCandidateId ? candidates.find((c) => c.candidate_id === editingCandidateId) : null;
 
   return (
     <>
@@ -121,9 +119,7 @@ function GeneratePageContent() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold tracking-tight">
-                    Review Candidates
-                  </h2>
+                  <h2 className="text-2xl font-semibold tracking-tight">Review Candidates</h2>
                   <p className="text-sm text-muted-foreground mt-1">
                     {candidates.length} candidate{candidates.length !== 1 ? "s" : ""} generated
                     {acceptedCount > 0 && ` • ${acceptedCount} accepted`}
@@ -131,13 +127,13 @@ function GeneratePageContent() {
                 </div>
               </div>
 
-            <CandidatesList
-              candidates={candidates}
-              onAccept={acceptCandidate}
-              onUnaccept={unacceptCandidate}
-              onEdit={handleEdit}
-              onReject={rejectCandidate}
-            />
+              <CandidatesList
+                candidates={candidates}
+                onAccept={acceptCandidate}
+                onUnaccept={unacceptCandidate}
+                onEdit={handleEdit}
+                onReject={rejectCandidate}
+              />
 
               {/* Commit Bar - shown at bottom when candidates are accepted */}
               {acceptedCount > 0 && (
@@ -147,15 +143,9 @@ function GeneratePageContent() {
                       <p className="font-medium">
                         {acceptedCount} flashcard{acceptedCount !== 1 ? "s" : ""} ready to save
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        Click save to add them to your collection
-                      </p>
+                      <p className="text-sm text-muted-foreground">Click save to add them to your collection</p>
                     </div>
-                    <Button
-                      onClick={handleCommit}
-                      disabled={isCommitting}
-                      size="lg"
-                    >
+                    <Button onClick={handleCommit} disabled={isCommitting} size="lg">
                       <Save />
                       {isCommitting ? "Saving..." : "Save Accepted"}
                     </Button>

@@ -1,0 +1,554 @@
+# End-to-End Testing Guide - OpenRouter Integration
+
+**Status**: Ready for Testing  
+**Date**: 2026-01-26  
+**Test Type**: Manual E2E with Real OpenRouter API
+
+---
+
+## ✅ Pre-Test Verification Checklist
+
+Before testing, verify all components are configured:
+
+### 1. Environment Variables
+Check `.env` file contains:
+```bash
+✅ SUPABASE_URL=http://127.0.0.1:54321
+✅ SUPABASE_KEY=eyJhbG...
+✅ OPENROUTER_API_KEY=sk-or-v1-ebd...
+✅ OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+✅ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini
+```
+
+### 2. Database Setup
+```bash
+# Ensure Supabase is running
+supabase status
+
+# Should show:
+# - API URL: http://127.0.0.1:54321
+# - DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+# - Status: running
+
+# Apply migrations (if not done yet)
+npx supabase db reset --local
+```
+
+### 3. Verify Tables Exist
+```bash
+# Check tables in Supabase Studio
+# Open: http://127.0.0.1:54323
+# Navigate to: Table Editor
+
+✅ flashcards (with columns: id, user_id, front, back, source, generation_id, created_at, updated_at)
+✅ generations (with columns: id, user_id, model, source_text_hash, source_text_length, generated_count, generation_duration, etc.)
+✅ generation_error_logs (with columns: id, user_id, model, error_code, error_message, etc.)
+```
+
+### 4. Start Development Server
+```bash
+npm run dev
+
+# Should start on: http://localhost:4321
+# Wait for: "ready in XXXms"
+```
+
+---
+
+## 🧪 Test Scenarios
+
+### Scenario 1: Happy Path - Generate & Save Flashcards
+
+**Objective**: Generate flashcards from OpenRouter and save them to database
+
+**Steps:**
+
+1. **Navigate to Generate Page**
+   ```
+   Open: http://localhost:4321/generate
+   ```
+
+2. **Prepare Source Text**
+   - Copy a text between **1000-10000 characters** (e.g., Wikipedia article)
+   - Example source (Polish):
+   ```
+   HTTP (Hypertext Transfer Protocol) to protokół komunikacyjny używany do 
+   przesyłania dokumentów hipertekstowych, głównie stron WWW. Jest podstawą 
+   komunikacji w Internecie i stanowi fundament World Wide Web. HTTP działa 
+   w modelu klient-serwer, gdzie klient (zazwyczaj przeglądarka) wysyła 
+   żądanie do serwera, a serwer odpowiada żądanym zasobem. Protokół definiuje 
+   metody żądań (GET, POST, PUT, DELETE itp.) oraz kody statusu odpowiedzi 
+   (200 OK, 404 Not Found, 500 Internal Server Error itp.). HTTP jest protokołem 
+   bezstanowym, co oznacza, że każde żądanie jest niezależne od poprzednich. 
+   Wersja HTTPS (HTTP Secure) dodaje warstwę szyfrowania SSL/TLS, zapewniając 
+   bezpieczną komunikację poprzez szyfrowanie przesyłanych danych.
+   [... continue until 1000+ characters ...]
+   ```
+
+3. **Paste Text and Verify**
+   - Paste text into textarea
+   - Check character counter shows: **"X / 10000"** (should be green if valid)
+   - Verify "Generate Flashcards" button is **enabled**
+
+4. **Click "Generate Flashcards"**
+   - Button shows spinner
+   - Wait for response (5-30 seconds depending on text length)
+
+5. **Verify AI Response**
+   Expected behavior:
+   - ✅ Toast notification: "Generated X flashcard candidates"
+   - ✅ Status panel appears with:
+     - Model: "openai/gpt-4o-mini"
+     - Generated: X candidates
+     - Duration: XXXXms
+   - ✅ Candidate cards appear in list
+   - ✅ Each card has:
+     - Front (question)
+     - Back (answer, collapsed by default)
+     - Score (0.0 - 1.0)
+     - Action buttons (Accept ✓, Edit ✎, Reject ✗)
+
+6. **Inspect Generated Candidates**
+   - Click "Expand" on back to see full answer
+   - Verify front and back are in Polish
+   - Verify content is relevant to source text
+   - Check score values are reasonable (typically 0.7-1.0)
+
+7. **Accept Candidates**
+   - Click ✓ (Accept) on 2-3 candidates
+   - Verify:
+     - Card turns green
+     - Green dot appears in top-left corner
+     - "X accepted" counter updates
+     - Commit bar appears at bottom
+
+8. **Save to Database**
+   - Click "Save Accepted" in commit bar
+   - Wait for spinner (~1-2 seconds)
+   - Verify:
+     - Toast: "Saved X flashcards" or similar
+     - CommitResultModal opens
+     - Modal shows "Saved" section with saved flashcards
+     - (May show "Skipped" if duplicates exist)
+
+9. **Verify Database Storage**
+   - Open Supabase Studio: http://127.0.0.1:54323
+   - Navigate to Table Editor → `generations`
+   - Verify new row exists with:
+     - `user_id`: 00000000-0000-0000-0000-000000000001 (test user)
+     - `model`: openai/gpt-4o-mini
+     - `source_text_length`: your text length
+     - `generated_count`: number of candidates
+     - `generation_duration`: duration in ms
+   - Navigate to `flashcards` table
+   - Verify flashcards were saved with:
+     - `front`: question text
+     - `back`: answer text
+     - `source`: "ai-full"
+     - `generation_id`: matches generation ID
+
+**Expected Result**: ✅ Flashcards generated by AI and successfully saved to database
+
+---
+
+### Scenario 2: Edit Before Saving
+
+**Objective**: Edit AI-generated candidate before accepting
+
+**Steps:**
+
+1. Generate flashcards (follow Scenario 1, steps 1-5)
+
+2. **Click Edit (✎) on one candidate**
+   - Modal opens with edit form
+   - Front and back are pre-filled
+   - Character counters show remaining chars
+
+3. **Modify Content**
+   - Change front text (e.g., translate to different language)
+   - Modify back text
+   - Verify character counters update in real-time
+
+4. **Save Changes**
+   - Click "Save Changes" (or press Cmd+Enter)
+   - Modal closes
+   - Verify:
+     - Card shows updated text
+     - Badge "Edited" appears on card
+     - Card is automatically accepted (green)
+
+5. **Save to Database**
+   - Click "Save Accepted"
+   - Verify in database:
+     - Flashcard has `source`: "ai-edited"
+
+**Expected Result**: ✅ Edited flashcard saved with correct source type
+
+---
+
+### Scenario 3: Validation Errors
+
+**Objective**: Test input validation at various levels
+
+**Steps:**
+
+#### A. Frontend Validation
+
+1. **Too Short Text**
+   - Paste text < 1000 characters
+   - Verify:
+     - Character counter turns yellow/red
+     - Warning message appears
+     - "Generate" button is disabled
+
+2. **Too Long Text**
+   - Paste text > 10000 characters
+   - Verify:
+     - Text is truncated to 10000
+     - Warning message appears
+
+3. **Edit Modal Validation**
+   - Open edit modal
+   - Delete all text from front
+   - Verify error: "cannot be empty"
+   - Type 201+ characters
+   - Verify error: "must be 200 characters or less"
+
+#### B. API Validation
+
+1. **Force API Call with Invalid Data**
+   - Open browser DevTools (F12)
+   - Go to Network tab
+   - Generate flashcards normally
+   - Find `/api/generations` request
+   - Right-click → Copy as cURL
+   - Modify JSON body to have `source_text` with < 1000 chars
+   - Execute modified cURL in terminal
+   - Verify response: `400 Bad Request` with validation error
+
+**Expected Result**: ✅ All validation layers working correctly
+
+---
+
+### Scenario 4: Error Handling
+
+**Objective**: Test error scenarios and recovery
+
+**Steps:**
+
+#### A. Invalid API Key
+
+1. **Temporarily Break API Key**
+   ```bash
+   # Edit .env
+   OPENROUTER_API_KEY=invalid-key-xxx
+   ```
+
+2. **Restart dev server** (Ctrl+C, then `npm run dev`)
+
+3. **Try to generate flashcards**
+   - Expected:
+     - Error toast appears
+     - Message: "Authorization failed" or similar
+     - No candidates generated
+
+4. **Check Database**
+   - Open `generation_error_logs` table
+   - Verify error was logged with:
+     - `error_code`: "auth_error"
+     - `error_message`: "Authorization failed"
+
+5. **Restore API Key** and restart server
+
+#### B. Network Timeout (Simulated)
+
+1. **Use Very Long Text**
+   - Paste 10000 characters of complex text
+   - Generate flashcards
+   - If timeout occurs:
+     - Error toast: "Request timed out"
+     - Error logged to `generation_error_logs`
+
+#### C. Invalid JSON Response (if possible to simulate)
+
+- This tests the validation retry mechanism
+- AI should self-correct after feedback
+
+**Expected Result**: ✅ Errors handled gracefully, logged to database, user-friendly messages
+
+---
+
+### Scenario 5: Cost Monitoring
+
+**Objective**: Verify cost estimation and logging
+
+**Steps:**
+
+1. **Generate flashcards** (follow Scenario 1)
+
+2. **Check Server Logs**
+   - Look at terminal where `npm run dev` is running
+   - Find log: `Generation cost estimate:`
+   - Verify shows:
+     ```
+     {
+       userId: '00000000-0000-0000-0000-000000000001',
+       estimatedTokens: XXXX
+     }
+     ```
+
+3. **Check OpenRouter Dashboard** (if available)
+   - Log in to openrouter.ai
+   - Navigate to usage/billing
+   - Verify request appears with:
+     - Model: openai/gpt-4o-mini
+     - Tokens used
+     - Cost
+
+**Expected Result**: ✅ Costs are estimated and can be monitored
+
+---
+
+### Scenario 6: Multiple Generations
+
+**Objective**: Test multiple generation cycles
+
+**Steps:**
+
+1. Generate flashcards with text A
+2. Accept and save some candidates
+3. Clear textarea
+4. Generate flashcards with text B
+5. Accept and save different candidates
+
+**Verify:**
+- Both generations stored in `generations` table
+- Each has unique ID
+- Flashcards correctly linked to their generation_id
+- No interference between generations
+
+**Expected Result**: ✅ Multiple generations work independently
+
+---
+
+### Scenario 7: Circuit Breaker (Optional Advanced Test)
+
+**Objective**: Test circuit breaker protection
+
+**Steps:**
+
+1. **Cause 5+ Consecutive Failures**
+   - Temporarily set invalid API key
+   - Try to generate 6 times quickly
+
+2. **Verify Circuit Opens**
+   - After 5 failures, next attempt should fail immediately
+   - Error: "Circuit breaker is OPEN. Service unavailable. Retry in XXs"
+
+3. **Wait for Recovery**
+   - Wait 60 seconds (circuit breaker timeout)
+   - Fix API key
+   - Try again - should transition to HALF_OPEN
+   - After 2 successes, circuit should close
+
+**Expected Result**: ✅ Circuit breaker protects against cascading failures
+
+---
+
+## 🔍 What to Look For
+
+### Success Indicators
+
+✅ **API Integration**:
+- Requests reach OpenRouter successfully
+- Responses are valid JSON matching schema
+- Validation works (retry mechanism if needed)
+
+✅ **Database**:
+- Generations recorded correctly
+- Flashcards saved with all required fields
+- Errors logged appropriately
+
+✅ **UI/UX**:
+- Smooth flow from generate → review → save
+- Toast notifications work
+- Modals open/close properly
+- Loading states shown
+
+✅ **Error Handling**:
+- Errors caught and displayed
+- User-friendly messages
+- No crashes or blank screens
+
+### Potential Issues
+
+❌ **API Errors**:
+- 401 Unauthorized → Check API key
+- 429 Rate Limited → Wait and retry
+- 504 Timeout → Use shorter text or wait
+
+❌ **Database Errors**:
+- "Failed to store generation record" → Check Supabase connection
+- Unique constraint violation → Expected for duplicate fronts
+
+❌ **Validation Errors**:
+- "Invalid response format" → Check JSON schema matches AI output
+- "Validation failed" → AI returned malformed JSON
+
+---
+
+## 📊 Monitoring Dashboard
+
+### Supabase Studio
+```
+URL: http://127.0.0.1:54323
+```
+
+**Tables to Monitor**:
+- `generations` - All AI generation attempts
+- `flashcards` - Saved flashcards
+- `generation_error_logs` - Errors for debugging
+
+**Useful Queries**:
+
+```sql
+-- Recent generations
+SELECT * FROM generations 
+ORDER BY created_at DESC 
+LIMIT 10;
+
+-- Success rate
+SELECT 
+  COUNT(*) as total_generations,
+  AVG(generated_count) as avg_candidates
+FROM generations
+WHERE created_at > now() - interval '1 hour';
+
+-- Error frequency
+SELECT 
+  error_code, 
+  COUNT(*) as count
+FROM generation_error_logs
+WHERE created_at > now() - interval '1 hour'
+GROUP BY error_code;
+
+-- Recent flashcards
+SELECT 
+  f.front,
+  f.source,
+  g.model,
+  f.created_at
+FROM flashcards f
+LEFT JOIN generations g ON f.generation_id = g.id
+ORDER BY f.created_at DESC
+LIMIT 10;
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### "API key not configured"
+**Solution**: Check `.env` has `OPENROUTER_API_KEY`
+
+### "Database client not available"
+**Solution**: Restart dev server, check Supabase is running
+
+### "Circuit breaker is OPEN"
+**Solution**: Wait 60 seconds or restart dev server
+
+### "Validation failed after X attempts"
+**Solution**: 
+- Check AI is returning correct JSON format
+- Inspect response in console logs
+- May need to adjust system prompt or schema
+
+### "Failed to store generation record"
+**Solution**:
+- Check Supabase connection
+- Verify migrations applied: `npx supabase db reset --local`
+- Check RLS is disabled for testing
+
+### Flashcards not appearing in database
+**Solution**:
+- Open DevTools Network tab
+- Check if POST to `/api/generations` succeeded (200)
+- Check response body for errors
+- Verify Supabase Studio shows the data
+
+---
+
+## ✨ Success Criteria
+
+**Minimum Viable Test**:
+- ✅ Generate flashcards from real AI
+- ✅ Save at least 1 flashcard to database
+- ✅ Verify in Supabase Studio
+
+**Full Success**:
+- ✅ All scenarios 1-6 pass
+- ✅ No console errors
+- ✅ Data persists in database
+- ✅ Error handling works
+- ✅ UI is responsive and smooth
+
+---
+
+## 📝 Test Log Template
+
+Use this to track your testing:
+
+```markdown
+## Test Session: [Date/Time]
+
+### Environment
+- Node version: [run `node -v`]
+- Supabase status: [running/stopped]
+- OpenRouter API: [configured/not configured]
+
+### Scenario 1: Happy Path
+- [ ] Generated flashcards: YES/NO
+- [ ] Count: ___
+- [ ] Saved to DB: YES/NO
+- [ ] Issues: ___
+
+### Scenario 2: Edit
+- [ ] Edit modal works: YES/NO
+- [ ] Saved as "ai-edited": YES/NO
+- [ ] Issues: ___
+
+[... continue for each scenario ...]
+
+### Overall Result
+- Status: ✅ PASS / ❌ FAIL
+- Notes: ___
+```
+
+---
+
+## 🎯 Next Steps After Testing
+
+1. **If all tests pass**:
+   - Document any issues found
+   - Measure average generation time
+   - Estimate costs per generation
+   - Plan for production deployment
+
+2. **If tests fail**:
+   - Document error messages
+   - Check logs in terminal and Supabase
+   - Review implementation against plan
+   - Fix issues and re-test
+
+3. **Production Readiness**:
+   - Enable authentication (remove TEST_MODE)
+   - Re-enable RLS policies
+   - Add rate limiting
+   - Set up monitoring/alerting
+   - Configure production OpenRouter key
+
+---
+
+**Happy Testing! 🎉**
+
+Report any issues or unexpected behavior for further investigation.
