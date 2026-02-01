@@ -39,6 +39,7 @@ http://localhost:4321/generate
 ### ✅ Akcje na kandydatach
 
 #### Accept (✓)
+
 - Kliknij zielony przycisk z checkmarkiem
 - Karta zmieni kolor na zielony
 - Pojawi się zielona kropka w lewym górnym rogu
@@ -46,6 +47,7 @@ http://localhost:4321/generate
 - Commit Bar pojawi się na dole
 
 #### Edit (✎)
+
 - Kliknij przycisk z ołówkiem
 - Otworzy się modal z formularzem
 - Edytuj front (max 200 znaków) i back (max 500 znaków)
@@ -54,6 +56,7 @@ http://localhost:4321/generate
 - Karta dostanie badge "Edited" i status "ai-edited"
 
 #### Reject (✗)
+
 - Kliknij czerwony przycisk z X
 - Karta zniknie z listy
 
@@ -74,6 +77,7 @@ http://localhost:4321/generate
 ## 🎯 Scenariusze testowe
 
 ### Scenariusz 1: Happy Path
+
 ```
 1. Wklej 2000 znaków tekstu
 2. Generate → Otrzymasz ~4 kandydaty
@@ -83,6 +87,7 @@ http://localhost:4321/generate
 ```
 
 ### Scenariusz 2: Edycja kandydatów
+
 ```
 1. Generate kandydaty
 2. Kliknij Edit na jednym
@@ -93,6 +98,7 @@ http://localhost:4321/generate
 ```
 
 ### Scenariusz 3: Walidacja
+
 ```
 1. Wklej < 1000 znaków → Ostrzeżenie żółte
 2. Wklej > 10000 znaków → Zostanie obcięte + ostrzeżenie
@@ -100,6 +106,7 @@ http://localhost:4321/generate
 ```
 
 ### Scenariusz 4: Modal edycji - walidacja
+
 ```
 1. Otwórz modal edycji
 2. Usuń cały tekst z front → Błąd "cannot be empty"
@@ -110,6 +117,7 @@ http://localhost:4321/generate
 ## 🔍 Czego szukać
 
 ### UI/UX:
+
 - [ ] Animacje są płynne
 - [ ] Liczniki działają w czasie rzeczywistym
 - [ ] Toasty pojawiają się i znikają
@@ -119,12 +127,14 @@ http://localhost:4321/generate
 - [ ] Responsywność (zmień szerokość okna)
 
 ### Funkcjonalność:
+
 - [ ] Accept/Reject/Edit działają
 - [ ] Commit bar pokazuje poprawną liczbę
 - [ ] CommitResultModal pokazuje saved/skipped
 - [ ] Można edytować i ponownie zaakceptować
 
 ### Accessibility:
+
 - [ ] Tab navigation działa
 - [ ] Screen reader announcements (włącz VoiceOver/NVDA)
 - [ ] Keyboard shortcuts (Cmd+Enter w modalu)
@@ -132,11 +142,13 @@ http://localhost:4321/generate
 ## 📊 Mock Data
 
 ### Generowane kandydaty:
+
 - Liczba: 1 na każde 500 znaków (max 8)
 - Score: Losowy między 0.78 - 0.95
 - Tematy: Historia, nauka, geografia (przykładowe)
 
 ### Commit result:
+
 - ~90% saved
 - ~10% skipped (losowo)
 - Powód skip: "duplicate_front"
@@ -144,12 +156,14 @@ http://localhost:4321/generate
 ## 🔄 Reset stanu
 
 Aby przetestować od nowa:
+
 1. Odśwież stronę (F5)
 2. Lub wyczyść tekst i wygeneruj ponownie
 
 ## ⚠️ Ograniczenia Demo Mode
 
 Demo mode **NIE** ma:
+
 - ❌ Prawdziwej bazy danych (nic nie jest zapisywane)
 - ❌ Autentykacji (auth guard wyłączony)
 - ❌ AI generacji (kandydaty są stałe)
@@ -157,6 +171,7 @@ Demo mode **NIE** ma:
 - ❌ Rate limiting (możesz generować w kółko)
 
 Demo mode **MA**:
+
 - ✅ Pełny UI flow
 - ✅ Wszystkie komponenty
 - ✅ Walidację
@@ -168,6 +183,7 @@ Demo mode **MA**:
 ## 🐛 Znane problemy
 
 Jeśli coś nie działa:
+
 1. Sprawdź konsolę (F12) - błędy?
 2. Upewnij się że `npm run dev` działa
 3. Sprawdź czy wszystkie pliki zostały zapisane
@@ -176,6 +192,7 @@ Jeśli coś nie działa:
 ## 📝 Co dalej?
 
 Po przetestowaniu UI, następne kroki to:
+
 1. Implementacja prawdziwych API endpoints
 2. Integracja z Supabase
 3. AI integration (OpenRouter)

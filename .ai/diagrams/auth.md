@@ -1,13 +1,14 @@
 <authentication_analysis>
+
 - Wypisane przepływy autentykacji:
-  1) Rejestracja (signUp)
-  2) Weryfikacja e-mail (link z Supabase)
-  3) Logowanie (signInWithPassword)
-  4) Reset hasła (resetPasswordForEmail + updateUser)
-  5) Wylogowanie (signOut)
-  6) Usunięcie konta (DELETE /api/account z admin key)
-  7) Dostęp do chronionych stron (auth guard + redirect)
-  8) Zarządzanie sesją i odświeżanie tokenu (access/refresh)
+  1. Rejestracja (signUp)
+  2. Weryfikacja e-mail (link z Supabase)
+  3. Logowanie (signInWithPassword)
+  4. Reset hasła (resetPasswordForEmail + updateUser)
+  5. Wylogowanie (signOut)
+  6. Usunięcie konta (DELETE /api/account z admin key)
+  7. Dostęp do chronionych stron (auth guard + redirect)
+  8. Zarządzanie sesją i odświeżanie tokenu (access/refresh)
 
 - Główni aktorzy i interakcje:
   - Przeglądarka (Browser) — formularze, kliknięcia linków, żądania
@@ -29,9 +30,10 @@
   5. Odświeżanie: SDK używa refresh token gdy access wygasł.
   6. Reset hasła: Browser -> SupabaseAuth resetPasswordForEmail -> link -> reset.
   7. Wylogowanie: Browser -> SupabaseAuth signOut -> redirect.
-</authentication_analysis>
+     </authentication_analysis>
 
 <mermaid_diagram>
+
 ```mermaid
 sequenceDiagram
 autonumber
@@ -122,5 +124,5 @@ Note over Browser,Middleware: Middleware handles cookies,<br/>Authorization head
 
 deactivate Browser
 ```
-</mermaid_diagram>
 
+</mermaid_diagram>

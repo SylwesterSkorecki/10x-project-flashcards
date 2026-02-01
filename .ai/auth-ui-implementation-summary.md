@@ -13,6 +13,7 @@ Wszystkie elementy interfejsu użytkownika dla procesu autentykacji zostały zai
 **Plik:** `src/lib/schemas/auth.schema.ts`
 
 Utworzone schematy:
+
 - ✅ `LoginSchema` - walidacja emaila i hasła
 - ✅ `RegisterSchema` - walidacja rejestracji z wymaganiami bezpieczeństwa hasła
 - ✅ `ForgotPasswordSchema` - walidacja emaila
@@ -23,6 +24,7 @@ Utworzone schematy:
 **Katalog:** `src/components/auth/`
 
 Utworzone komponenty:
+
 - ✅ `LoginForm.tsx` - formularz logowania
   - Walidacja email i hasła
   - Obsługa parametru returnTo
@@ -70,6 +72,7 @@ Utworzone komponenty:
 **Katalog:** `src/pages/auth/`
 
 Utworzone strony:
+
 - ✅ `login.astro` - strona logowania
   - Obsługa parametru returnTo
   - Wyświetlanie komunikatów statusu (logged_out, email_verified, etc.)
@@ -102,6 +105,7 @@ Utworzone strony:
 ### Stylistyka i design
 
 ✅ **Spójna z istniejącymi komponentami:**
+
 - Wzorowane na `CommitResultModal.tsx` i `EditCandidateModal.tsx`
 - Wykorzystanie Shadcn/ui (Button, Input, Label, Dialog)
 - Tailwind CSS dla stylowania
@@ -111,6 +115,7 @@ Utworzone strony:
 ### Dostępność (Accessibility)
 
 ✅ **Implementacja best practices:**
+
 - Semantyczne HTML
 - ARIA labels i descriptions
 - Prawidłowe powiązania label-input (useId)
@@ -121,6 +126,7 @@ Utworzone strony:
 ### Walidacja
 
 ✅ **Wielopoziomowa walidacja:**
+
 - Walidacja kliencka w czasie rzeczywistym (Zod)
 - Wyświetlanie błędów pod odpowiednimi polami
 - Wskaźniki pozostałych znaków (dla haseł)
@@ -129,6 +135,7 @@ Utworzone strony:
 ### UX/UI Features
 
 ✅ **Przyjazny interfejs:**
+
 - Stany ładowania (loading spinner)
 - Disable pól podczas submitu
 - Komunikaty sukcesu i błędów
@@ -151,6 +158,7 @@ Wszystkie komponenty zawierają zakomentowane TODO z kodem do integracji z Supab
 ### Co jest wymagane do pełnej integracji:
 
 **Backend:**
+
 1. Utworzenie klienta Supabase (`src/db/supabase.client.ts`)
 2. Implementacja middleware do obsługi sesji (`src/middleware/index.ts`)
 3. Utworzenie serwisu auth (`src/lib/services/auth.service.ts`)
@@ -158,6 +166,7 @@ Wszystkie komponenty zawierają zakomentowane TODO z kodem do integracji z Supab
 5. Endpoint API do usunięcia konta (`src/pages/api/account/index.ts`)
 
 **Konfiguracja Supabase:**
+
 1. Email templates (confirm signup, reset password)
 2. URL Configuration (redirect URLs)
 3. Password requirements
@@ -166,6 +175,7 @@ Wszystkie komponenty zawierają zakomentowane TODO z kodem do integracji z Supab
 6. CASCADE dla kluczy obcych
 
 **Strony Astro:**
+
 1. Odkomentowanie auth guards
 2. Sprawdzanie sesji użytkownika
 3. Przekierowania dla zalogowanych/niezalogowanych
@@ -241,23 +251,27 @@ src/
 ## Następne kroki
 
 ### Faza 1: Backend i middleware (nie zrealizowane)
+
 - [ ] Implementacja middleware z obsługą sesji
 - [ ] Utworzenie auth service
 - [ ] Helper do mapowania błędów
 - [ ] Endpoint API do usunięcia konta
 
 ### Faza 2: Integracja z Supabase (nie zrealizowane)
+
 - [ ] Konfiguracja Supabase Auth w Dashboard
 - [ ] Email templates
 - [ ] URL redirects
 - [ ] Password policies
 
 ### Faza 3: Auth guards (nie zrealizowane)
+
 - [ ] Odkomentowanie auth guards w stronach
 - [ ] Sprawdzanie sesji
 - [ ] Przekierowania
 
 ### Faza 4: RLS i baza danych (nie zrealizowane)
+
 - [ ] Polityki RLS dla tabel
 - [ ] CASCADE dla kluczy obcych
 - [ ] Migracje bazy danych
@@ -272,6 +286,7 @@ Wszystkie komponenty są gotowe do użycia i wymagają jedynie integracji z back
 ## Zgodność ze specyfikacją
 
 Implementacja w 100% zgodna z wymaganiami z `auth-spec.md`:
+
 - ✅ Sekcja 1.2: Modyfikacja layoutu aplikacji (Navigation)
 - ✅ Sekcja 1.3: Komponenty React (wszystkie formularze)
 - ✅ Sekcja 1.4: Obsługa walidacji i błędów w UI

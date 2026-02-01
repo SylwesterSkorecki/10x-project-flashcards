@@ -24,7 +24,7 @@ export function ForgotPasswordForm() {
       setEmailError(null);
       return true;
     } catch (err) {
-      const error = err as { errors?: Array<{ message: string }> };
+      const error = err as { errors?: { message: string }[] };
       setEmailError(error.errors?.[0]?.message || "Nieprawidłowy email");
       return false;
     }

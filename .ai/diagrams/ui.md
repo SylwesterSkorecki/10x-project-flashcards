@@ -1,4 +1,5 @@
 <architecture_analysis>
+
 - Komponenty wymienione w PRD/specyfikacji:
   - Strony Astro: login, register, forgot-password, reset-password,
     verify-email, account/settings, generate, index
@@ -25,9 +26,10 @@
   - RegisterForm: walidacja, signUp, informacja o emailu weryfik.
   - Navigation: show links based on auth state, signOut
   - AccountSettings: reauth + delete account flow
-</architecture_analysis>
+    </architecture_analysis>
 
 <mermaid_diagram>
+
 ```mermaid
 flowchart TD
   subgraph "Strony SSR"
@@ -85,5 +87,5 @@ flowchart TD
   classDef service fill:#f3f4f6,stroke:#333,stroke-width:1px;
   class SupabaseClient,Middleware service;
 ```
-</mermaid_diagram>
 
+</mermaid_diagram>

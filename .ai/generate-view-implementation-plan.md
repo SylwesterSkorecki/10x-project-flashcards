@@ -1,31 +1,37 @@
 # Plan implementacji widoku Generowanie (Generate)
 
 ## 1. Przegląd
+
 Widok `Generate` (/generate) umożliwia wklejenie długiego tekstu źródłowego (1000–10000 znaków), uruchomienie procesu generowania kandydatów na fiszki przez AI, przegląd wygenerowanych kandydatów z możliwością akceptacji/edycji/odrzucenia oraz zapis zaakceptowanych fiszek zbiorczo. Widok obsługuje zarówno synchroniczny (200) jak i asynchroniczny (202 + polling) flow generacji, pokazuje status i umożliwia anulowanie operacji.
 
 ## 2. Routing widoku
+
 - Główna ścieżka: `/generate`
 - Alternatywny dostęp do konkretnej generacji (review): `/generate/:generationId/review`
 - Trasa chroniona: wymaga zalogowania (auth guard, redirect do `/auth/login?returnTo=/generate`)
 
 ## 3. Struktura komponentów
+
 Hierarchia (top-down):
-- GeneratePage (strona)  
-  - GenerateTopbarAction (CTA w topbar — już istnieje globalnie)  
-  - GenerateFormPanel  
-    - TextAreaCounter  
-    - GenerateButton  
-    - RateLimitTooltip / CooldownBadge  
-  - GenerationStatusPanel (spinner, cancel, last-updated, toast bridge)  
-  - CandidatesSection (renderowane po otrzymaniu kandydatów)  
-    - CandidatesList  
-      - CandidateCard (per-card controls: Accept / Edit / Reject)  
-    - CommitBar (bulk commit button, accepted count)  
-  - EditCandidateModal (front/back fields, validation)  
+
+- GeneratePage (strona)
+  - GenerateTopbarAction (CTA w topbar — już istnieje globalnie)
+  - GenerateFormPanel
+    - TextAreaCounter
+    - GenerateButton
+    - RateLimitTooltip / CooldownBadge
+  - GenerationStatusPanel (spinner, cancel, last-updated, toast bridge)
+  - CandidatesSection (renderowane po otrzymaniu kandydatów)
+    - CandidatesList
+      - CandidateCard (per-card controls: Accept / Edit / Reject)
+    - CommitBar (bulk commit button, accepted count)
+  - EditCandidateModal (front/back fields, validation)
   - CommitResultModal (summary: saved/skipped + reasons)
 
 ## 4. Szczegóły komponentów
+
 ### GeneratePage
+
 - Opis: kontener strony, łączy API hooks, zarządza głównymi stanami (generationId, candidates, accepted list).
 - Główne elementy: `section` z GenerateFormPanel, GenerationStatusPanel, CandidatesSection.
 - Zdarzenia: inicjacja POST /api/generations, rozpoczęcie pollingu, cancel, commit.
@@ -34,6 +40,7 @@ Hierarchia (top-down):
 - Propsy: brak (route page).
 
 ### TextAreaCounter
+
 - Opis: textarea z licznikiem znaków, enforce max 10000, aria-live dla czytników.
 - Elementy: `<textarea>`, counter, inline error message element.
 - Zdarzenia: onChange, onPaste, onFocus.
@@ -42,6 +49,7 @@ Hierarchia (top-down):
 - Propsy: value, onChange, maxLength (10000), minLength (1000).
 
 ### GenerateButton
+
 - Opis: primary CTA; disabled gdy w cooldown/rate-limited, lub walidacja nieprzechodzi.
 - Elementy: button z spinnerem gdy request trwający.
 - Zdarzenia: onClick -> wywołuje startGeneration.
@@ -50,6 +58,7 @@ Hierarchia (top-down):
 - Propsy: disabled, onClick, isLoading.
 
 ### GenerationStatusPanel
+
 - Opis: pokazuje stan generowania (pending/progress/success/failure), cancel, time elapsed, toast integration.
 - Elementy: spinner/progress, cancel button, last-updated timestamp.
 - Zdarzenia: onCancel -> wysyła request cancela (implementacja: abort signal / API cancel if available).
@@ -58,6 +67,7 @@ Hierarchia (top-down):
 - Propsy: status, generationId, onCancel.
 
 ### CandidatesList
+
 - Opis: lista CandidateCard; renderowana gdy candidates dostępne.
 - Elementy: list (ul/ol) z CandidateCard.
 - Zdarzenia: propaguje accept/edit/reject z kart.
@@ -66,6 +76,7 @@ Hierarchia (top-down):
 - Propsy: candidates, onAccept, onEdit, onReject.
 
 ### CandidateCard
+
 - Opis: pojedyncza propozycja fiszki, pokazywana front/back (preview), score, akcje Accept/Edit/Reject.
 - Elementy: front preview, back preview (expandable), score badge, buttons Accept/Edit/Reject.
 - Zdarzenia: onAccept, onEdit (opens modal), onReject (removes from list or sets status rejected).
@@ -74,6 +85,7 @@ Hierarchia (top-down):
 - Propsy: candidate, onAccept, onEdit, onReject.
 
 ### EditCandidateModal
+
 - Opis: modal do edycji front/back; trap focus; walidacja front ≤200, back ≤500.
 - Elementy: two inputs (front, back), save/cancel buttons, inline validation messages.
 - Zdarzenia: onSave -> aktualizuje local candidate, onCancel.
@@ -82,6 +94,7 @@ Hierarchia (top-down):
 - Propsy: initialCandidate, onSave, onClose.
 
 ### CommitBar
+
 - Opis: pasek u dołu listy pokazujący liczbę zaakceptowanych i CTA „Zapisz zaakceptowane”.
 - Elementy: accepted count, SaveButton, optional select-all.
 - Zdarzenia: onCommit -> POST /api/generations/{id}/commit lub /api/flashcards/bulk.
@@ -90,6 +103,7 @@ Hierarchia (top-down):
 - Propsy: acceptedCount, onCommit, isLoading.
 
 ### CommitResultModal
+
 - Opis: pokazuje wynik operacji zapisu: saved/skipped z powodami (np. duplicate_front).
 - Elementy: two lists (saved, skipped) z per-item reason, buttons Close / Retry failed.
 - Zdarzenia: onRetry, onClose.
@@ -98,6 +112,7 @@ Hierarchia (top-down):
 - Propsy: result, onRetry.
 
 ## 5. Typy
+
 - Użyć istniejących DTO z `src/types.ts`:
   - CreateGenerationCommand { source_text, model?, max_candidates?, timeout_seconds? }
   - CreateGenerationResponseSync / Async
@@ -106,6 +121,7 @@ Hierarchia (top-down):
   - BulkCreateFlashcardsCommand, BulkSaveResult
 
 Dodatkowe ViewModel / lokalne typy do dodań:
+
 - EditedCandidateViewModel:
   - candidate_id: string
   - front: string
@@ -123,6 +139,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
   - error?: ApiError
 
 ## 6. Zarządzanie stanem
+
 - Lokalny stan strony + TanStack Query do komunikacji i pollingu:
   - useGenerateMutation (POST /api/generations) — opcje: retry=0 (mutacja), timeout sterowany przez API, onSuccess rozdziela sync/async flows.
   - useGenerationQuery(generationId) (GET /api/generations/{id}) — polling z exponential backoff (useInfinite / query with enabled flag) do momentu wygenerowania candidates.
@@ -135,6 +152,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
   - Korzyści: enkapsulacja logiki pollingu, retry/backoff, cancel, cooldown, i side-effects (toasts, cache invalidation).
 
 ## 7. Wywołania API i akcje frontendowe
+
 - POST /api/generations — payload CreateGenerationCommand. Frontend:
   - Validate source_text length (1000–10000) before call.
   - If 200 — otrzymać candidates → populate candidates list.
@@ -150,6 +168,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
   - On skipped results (duplicates) show inline hints and allow user to edit and retry.
 
 ## 8. Mapowanie historyjek użytkownika do implementacji
+
 - US-001 Generowanie: TextAreaCounter + GenerateButton + POST /api/generations + polling
 - US-002 Recenzja: CandidatesList + CandidateCard + EditCandidateModal + per-card actions
 - US-003 Zapisanie zaakceptowanych: CommitBar + POST commit (bulk) + CommitResultModal + cache invalidation
@@ -158,6 +177,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
 - US-016 Walidacja długości: TextAreaCounter + client-side enforcement przed POST
 
 ## 9. Interakcje użytkownika i oczekiwane wyniki
+
 - Wklejenie tekstu → liczy znaki, blokuje jeśli >10000, pokazuje ostrzeżenie jeśli <1000.
 - Kliknij „Generuj” → przy spełnionych warunkach: button spinner, jeśli sync 200 -> lista kandydatów, jeśli 202 -> pending UI z pollingiem.
 - W trakcie pending: opcja Anuluj → zatrzymuje polling i zapytanie background cancel (jeśli backend obsługuje) lub odrzuca lokalnie.
@@ -165,6 +185,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
 - Kliknięcie „Zapisz zaakceptowane” → wysyła bulk commit; wynik pokazany w CommitResultModal; saved → invalidate cache; skipped → per-card inline reason z możliwością edycji i ponowienia.
 
 ## 10. Warunki i walidacja (komponenty)
+
 - TextAreaCounter:
   - Enforce: length ≤ 10000 (prevent input) i warn if <1000 (prevent submit).
 - EditCandidateModal:
@@ -179,6 +200,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
   - 503 → show retry modal/toast with guidance
 
 ## 11. Scenariusze błędów i obsługa
+
 - Network failure during POST generation:
   - Retry strategy: show toast „Błąd sieci” + allow Retry; do not lose source_text.
 - Generation 202 never completes (worker down):
@@ -193,6 +215,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
   - Show cooldown UI, disable GenerateButton until cooldownEnds.
 
 ## 12. Potencjalne wyzwania implementacyjne i rozwiązania
+
 - Polling + exponential backoff complexity:
   - Rozwiązanie: użyć TanStack Query `refetchInterval` z dynamicznym backoff albo custom retry logic w useGenerationQuery; enkapsulować w `useGenerateFlow`.
 - Anulowanie generowania:
@@ -207,6 +230,7 @@ Dodatkowe ViewModel / lokalne typy do dodań:
   - Optional: serializować tymczasowy generation state do sessionStorage by restoring on reload for generationId in URL.
 
 ## 13. Kroki implementacji (szczegółowe)
+
 1. Utworzyć strukturę pliku strony: `src/pages/generate.astro` lub React route wrapper; przygotować route guard (auth).
 2. Zaimplementować `TextAreaCounter` komponent (max enforcement, aria-live).
 3. Napisać custom hook `useGenerateFlow` z TanStack Query mutations i polling logic.
@@ -219,6 +243,6 @@ Dodatkowe ViewModel / lokalne typy do dodań:
 10. Dodać tests: unit dla hooka useGenerateFlow, e2e dla flow generate→review→commit.
 11. Dodać a11y checks i keyboard shortcuts.
 
---- 
+---
 
 Dokumentacja implementacji przygotowana. Następny krok: utworzyć finalny plik planu (ten plik).

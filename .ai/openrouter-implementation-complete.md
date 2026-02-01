@@ -23,10 +23,12 @@ Successfully implemented a complete OpenRouter service integration for AI-powere
 ### Phase 0: Environment Setup ✅
 
 **Files Modified:**
+
 - `.env.example` - Added OpenRouter configuration variables
 - `README.md` - Updated environment variables documentation with security notes
 
 **Environment Variables:**
+
 ```bash
 OPENROUTER_API_KEY=your_api_key
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1  # Optional
@@ -36,9 +38,11 @@ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional
 ### Phase 1: Client Implementation ✅
 
 **Files Created:**
+
 - `src/lib/services/openrouter.service.ts` (860 lines)
 
 **Key Features:**
+
 1. **Constructor with comprehensive configuration:**
    - API key validation
    - Configurable timeout, retries, backoff
@@ -73,21 +77,25 @@ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional
 ### Phase 2: Conversation Adapter & Validation ✅
 
 **Files Created:**
+
 - `src/lib/openrouter/templates.ts` (140 lines)
 - `src/lib/openrouter/response-validator.ts` (330 lines)
 - `src/lib/openrouter/index.ts` (export file)
 
 **System Message Templates:**
+
 - `JSON_ONLY_SYSTEM_MESSAGE` - For pure JSON responses
 - `FLASHCARD_GENERATION_SYSTEM_MESSAGE` - Flashcard-specific instructions
 - `STRICT_JSON_SCHEMA_SYSTEM_MESSAGE` - For strict validation
 - `RETRY_VALIDATION_SYSTEM_MESSAGE` - After validation failure
 
 **Helper Functions:**
+
 - `combineSystemMessages()` - Merge multiple templates
 - `createFlashcardGenerationPrompt()` - Generate prompts with options
 
 **Response Validator (ajv integration):**
+
 - Full JSON Schema validation with ajv
 - Compiled validator caching for performance
 - User-friendly error formatting
@@ -98,6 +106,7 @@ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional
 - Methods: `validate()`, `validateStrict()`, `isValidJson()`, `clearCache()`
 
 **Validation Retry Mechanism:**
+
 - `_sendWithValidationRetry()` method in service
 - Automatic retry on validation failure (default: 2 retries)
 - In strict mode: immediate throw
@@ -105,21 +114,25 @@ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional
 - Adds validation errors to conversation for self-correction
 
 **Dependencies Installed:**
+
 - `ajv@8.x` - JSON Schema validator
 - `ajv-formats@3.x` - Format validators (email, uri, etc.)
 
 ### Phase 3: API Integration ✅
 
 **Files Created:**
+
 - `src/lib/openrouter/flashcard-generation.schema.ts` (140 lines)
 - `src/lib/services/generations.service.ts` (350 lines)
 
 **Files Modified:**
+
 - `src/pages/api/generations/index.ts` - Replaced mock with real implementation
 - `src/lib/helpers/api-error.ts` - Added `not_implemented` error code
 - `src/lib/openrouter/index.ts` - Added schema exports
 
 **JSON Schema for Flashcards:**
+
 ```typescript
 {
   flashcards: [
@@ -140,11 +153,13 @@ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional
 ```
 
 **Features:**
+
 - Strict and lenient validation modes
 - TypeScript type guards
 - Runtime validation helpers
 
 **Generations Service:**
+
 - Main method: `generateFlashcards(userId, command)`
 - Cost estimation: `estimateGenerationCost(sourceText)`
 - Database integration:
@@ -155,6 +170,7 @@ OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini        # Optional
 - Proper validation and guards
 
 **API Endpoint Updates:**
+
 - Authentication checks using Supabase
 - Input validation (length, max_candidates)
 - Environment variable validation
@@ -260,9 +276,9 @@ const generationsService = new GenerationsService(supabase, {
 
 const response = await generationsService.generateFlashcards(userId, {
   source_text: "Your text here (1000-10000 chars)...",
-  model: "openai/gpt-4o-mini",  // Optional
-  max_candidates: 8,             // Optional (1-20)
-  timeout_seconds: 25            // Optional
+  model: "openai/gpt-4o-mini", // Optional
+  max_candidates: 8, // Optional (1-20)
+  timeout_seconds: 25, // Optional
 });
 
 // Response:
@@ -291,10 +307,7 @@ const service = new OpenRouterService({
 
 const response = await service.sendChatMessage(
   "conversation-id",
-  [
-    FLASHCARD_GENERATION_SYSTEM_MESSAGE,
-    createFlashcardGenerationPrompt(sourceText, { maxCards: 8 }),
-  ],
+  [FLASHCARD_GENERATION_SYSTEM_MESSAGE, createFlashcardGenerationPrompt(sourceText, { maxCards: 8 })],
   {
     model: "openai/gpt-4o-mini",
     temperature: 0.2,
@@ -334,6 +347,7 @@ All errors are properly classified and return user-friendly messages:
 ### Error Logging
 
 All generation errors are logged to `generation_error_logs` table:
+
 - Error code classification
 - Error message (truncated to 500 chars)
 - Source text hash and length
@@ -445,6 +459,7 @@ interface TelemetryClient {
 ```
 
 Events logged:
+
 - `chat_completion_success`
 - `chat_completion_error`
 - `rate_limit_hit`
@@ -533,13 +548,14 @@ The OpenRouter service integration is complete and production-ready. It provides
 ✅ Comprehensive error logging  
 ✅ User-friendly error messages  
 ✅ Security best practices  
-✅ Extensible architecture  
+✅ Extensible architecture
 
 The implementation follows all guidelines from the original plan and includes additional safety features like circuit breaker and validation retry mechanisms.
 
 ---
 
 **Next Steps:**
+
 1. Test the implementation with real API calls
 2. Monitor performance and costs
 3. Add telemetry integration

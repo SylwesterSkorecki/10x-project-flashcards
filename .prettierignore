@@ -1,0 +1,2 @@
+# Ignore files with Astro-specific syntax that prettier can't parse correctly
+src/pages/auth/verify-email.astro
