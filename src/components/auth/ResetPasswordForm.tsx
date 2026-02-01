@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { ResetPasswordSchema } from "@/lib/schemas/auth.schema";
 import { cn } from "@/lib/utils";
+import { supabaseClient } from "@/db/supabase.client";
 
 export function ResetPasswordForm() {
   const [password, setPassword] = useState("");
@@ -30,9 +31,9 @@ export function ResetPasswordForm() {
       error.errors?.forEach((err: any) => {
         const field = err.path[0];
         const message = err.message;
-        
-        if (field === 'password') setPasswordError(message);
-        if (field === 'confirmPassword') setConfirmPasswordError(message);
+
+        if (field === "password") setPasswordError(message);
+        if (field === "confirmPassword") setConfirmPasswordError(message);
       });
       return false;
     }
@@ -49,19 +50,24 @@ export function ResetPasswordForm() {
     setLoading(true);
 
     try {
-      // TODO: Implement actual password update logic with Supabase
-      // const { error } = await supabaseClient.auth.updateUser({
-      //   password: password
-      // });
-      
-      // if (error) throw error;
-      
-      // Redirect to login with success message
-      // window.location.href = '/auth/login?message=password_reset_success';
-      
-      console.log("Password reset submitted");
+      const { error } = await supabaseClient.auth.updateUser({
+        password: password,
+      });
+
+      if (error) throw error;
+
+      // Password updated successfully - redirect to login
+      window.location.href = "/auth/login?message=password_reset_success";
     } catch (error: any) {
-      setFormError("Wystąpił błąd. Spróbuj ponownie lub poproś o nowy link.");
+      const message = error.message?.toLowerCase() || "";
+
+      if (message.includes("same") || message.includes("similar")) {
+        setFormError("Nowe hasło musi być inne niż poprzednie");
+      } else if (message.includes("session") || message.includes("token")) {
+        setFormError("Link wygasł. Poproś o nowy link resetujący hasło.");
+      } else {
+        setFormError("Wystąpił błąd. Spróbuj ponownie lub poproś o nowy link.");
+      }
     } finally {
       setLoading(false);
     }
@@ -71,18 +77,12 @@ export function ResetPasswordForm() {
     <div className="w-full max-w-md mx-auto p-6 space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Ustaw nowe hasło</h1>
-        <p className="text-muted-foreground">
-          Wprowadź nowe hasło do swojego konta
-        </p>
+        <p className="text-muted-foreground">Wprowadź nowe hasło do swojego konta</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && (
-          <div
-            id={formErrorId}
-            role="alert"
-            className="p-3 rounded-md bg-destructive/10 border border-destructive/20"
-          >
+          <div id={formErrorId} role="alert" className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
             <p className="text-sm text-destructive flex items-center gap-2">
               <AlertCircle className="size-4 flex-shrink-0" />
               {formError}
@@ -112,11 +112,7 @@ export function ResetPasswordForm() {
             disabled={loading}
           />
           {passwordError && (
-            <p
-              id={passwordErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={passwordErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {passwordError}
             </p>
@@ -148,11 +144,7 @@ export function ResetPasswordForm() {
             disabled={loading}
           />
           {confirmPasswordError && (
-            <p
-              id={confirmPasswordErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={confirmPasswordErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {confirmPasswordError}
             </p>

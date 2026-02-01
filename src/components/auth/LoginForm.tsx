@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { LoginSchema } from "@/lib/schemas/auth.schema";
 import { cn } from "@/lib/utils";
+import { supabaseClient } from "@/db/supabase.client";
 
 interface LoginFormProps {
   returnTo?: string;
@@ -76,27 +77,34 @@ export function LoginForm({ returnTo }: LoginFormProps) {
     setLoading(true);
 
     try {
-      // TODO: Implement actual login logic with Supabase
-      // const { data, error } = await supabaseClient.auth.signInWithPassword({
-      //   email,
-      //   password
-      // });
-      
-      // if (error) throw error;
-      
-      // Redirect to returnTo or /generate
-      // const redirectUrl = returnTo || '/generate';
-      // window.location.href = redirectUrl;
-      
-      console.log("Login submitted:", { email, returnTo });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      // Check if email is confirmed (required for login)
+      if (data.user && !data.user.email_confirmed_at) {
+        setFormError("Email nie został zweryfikowany. Sprawdź swoją skrzynkę pocztową.");
+        // Sign out the user since we require email verification
+        await supabaseClient.auth.signOut();
+        return;
+      }
+
+      // Successful login - redirect to returnTo or /generate
+      const redirectUrl = returnTo || "/generate";
+      window.location.href = redirectUrl;
     } catch (error: any) {
       // Map Supabase errors to user-friendly messages
-      const message = error.message?.toLowerCase() || '';
-      
-      if (message.includes('invalid login credentials')) {
+      const message = error.message?.toLowerCase() || "";
+
+      if (message.includes("invalid login credentials")) {
         setFormError("Nieprawidłowy email lub hasło");
-      } else if (message.includes('email not confirmed')) {
+      } else if (message.includes("email not confirmed")) {
         setFormError("Email nie został zweryfikowany. Sprawdź swoją skrzynkę pocztową.");
+      } else if (message.includes("invalid")) {
+        setFormError("Nieprawidłowy email lub hasło");
       } else {
         setFormError("Wystąpił błąd podczas logowania. Spróbuj ponownie.");
       }
@@ -109,18 +117,12 @@ export function LoginForm({ returnTo }: LoginFormProps) {
     <div className="w-full max-w-md mx-auto p-6 space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Zaloguj się</h1>
-        <p className="text-muted-foreground">
-          Wpisz swoje dane aby uzyskać dostęp do konta
-        </p>
+        <p className="text-muted-foreground">Wpisz swoje dane aby uzyskać dostęp do konta</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && (
-          <div
-            id={formErrorId}
-            role="alert"
-            className="p-3 rounded-md bg-destructive/10 border border-destructive/20"
-          >
+          <div id={formErrorId} role="alert" className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
             <p className="text-sm text-destructive flex items-center gap-2">
               <AlertCircle className="size-4 flex-shrink-0" />
               {formError}
@@ -147,11 +149,7 @@ export function LoginForm({ returnTo }: LoginFormProps) {
             disabled={loading}
           />
           {emailError && (
-            <p
-              id={emailErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={emailErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {emailError}
             </p>
@@ -177,11 +175,7 @@ export function LoginForm({ returnTo }: LoginFormProps) {
             disabled={loading}
           />
           {passwordError && (
-            <p
-              id={passwordErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={passwordErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {passwordError}
             </p>
@@ -189,10 +183,7 @@ export function LoginForm({ returnTo }: LoginFormProps) {
         </div>
 
         <div className="flex items-center justify-end">
-          <a
-            href="/auth/forgot-password"
-            className="text-sm text-primary hover:underline"
-          >
+          <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">
             Zapomniałeś hasła?
           </a>
         </div>

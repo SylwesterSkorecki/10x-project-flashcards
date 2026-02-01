@@ -41,11 +41,7 @@ export function GenerateFormPanel({
       />
 
       <div className="flex justify-end">
-        <GenerateButton
-          onClick={onGenerate}
-          disabled={isDisabled}
-          isLoading={isLoading}
-        />
+        <GenerateButton onClick={onGenerate} disabled={isDisabled} isLoading={isLoading} />
       </div>
     </div>
   );

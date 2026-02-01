@@ -9,13 +9,7 @@ interface CandidatesListProps {
   onReject: (candidateId: string) => void;
 }
 
-export function CandidatesList({
-  candidates,
-  onAccept,
-  onUnaccept,
-  onEdit,
-  onReject,
-}: CandidatesListProps) {
+export function CandidatesList({ candidates, onAccept, onUnaccept, onEdit, onReject }: CandidatesListProps) {
   if (candidates.length === 0) {
     return (
       <div className="text-center py-12 px-4">
@@ -25,11 +19,7 @@ export function CandidatesList({
   }
 
   return (
-    <div
-      className="space-y-4"
-      role="list"
-      aria-label="Flashcard candidates"
-    >
+    <div className="space-y-4" role="list" aria-label="Flashcard candidates">
       {candidates.map((candidate) => (
         <div key={candidate.candidate_id} role="listitem">
           <CandidateCard

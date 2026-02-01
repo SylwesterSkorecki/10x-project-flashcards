@@ -1,13 +1,13 @@
 /**
  * OpenRouter Service — Integration with OpenRouter.ai API
- * 
+ *
  * Provides secure and standardized integration with OpenRouter API for LLM-based
  * chat completions. Features include:
  * - Unified HTTP client with retry and exponential backoff
  * - Response format validation (JSON Schema)
  * - Model parameter handling and model name mapping
  * - Centralized logging and cost metrics
- * 
+ *
  * Usage: Server-side only (API routes or backend services)
  */
 
@@ -114,10 +114,10 @@ export interface ModelMetadata {
 export interface ValidationResult {
   valid: boolean;
   data?: unknown;
-  errors?: Array<{
+  errors?: {
     path: string;
     message: string;
-  }>;
+  }[];
 }
 
 /**
@@ -205,14 +205,14 @@ interface OpenRouterErrorResponse {
 interface OpenRouterSuccessResponse {
   id: string;
   model: string;
-  choices: Array<{
+  choices: {
     message: {
       role: Role;
       content: string;
     };
     finish_reason: string;
     index: number;
-  }>;
+  }[];
   usage?: TokenUsage;
   created: number;
 }
@@ -243,13 +243,13 @@ export class OpenRouterService {
   // Circuit breaker state
   private readonly _circuitBreakerConfig?: CircuitBreakerConfig;
   private _circuitState: CircuitState = CircuitState.CLOSED;
-  private _failureCount: number = 0;
-  private _successCount: number = 0;
-  private _nextAttemptTime: number = 0;
+  private _failureCount = 0;
+  private _successCount = 0;
+  private _nextAttemptTime = 0;
 
   /**
    * Creates a new OpenRouterService instance
-   * 
+   *
    * @param config - Configuration options
    */
   constructor(config: OpenRouterServiceConfig) {
@@ -281,7 +281,7 @@ export class OpenRouterService {
 
   /**
    * Sends a chat message to OpenRouter and returns the model's response
-   * 
+   *
    * @param conversationId - Unique identifier for the conversation (for logging)
    * @param messages - Array of chat messages
    * @param options - Optional configuration for the request
@@ -336,7 +336,7 @@ export class OpenRouterService {
 
   /**
    * Gets metadata for a specific model
-   * 
+   *
    * @param model - Model identifier (optional, defaults to defaultModel)
    * @returns Promise resolving to model metadata
    */
@@ -354,7 +354,7 @@ export class OpenRouterService {
 
   /**
    * Validates a response against a predefined schema
-   * 
+   *
    * @param schemaName - Name of the schema to validate against
    * @param response - Response data to validate
    * @returns Validation result
@@ -379,7 +379,7 @@ export class OpenRouterService {
 
   /**
    * Updates the API key (useful for key rotation)
-   * 
+   *
    * @param key - New API key
    */
   setApiKey(key: string): void {
@@ -411,7 +411,7 @@ export class OpenRouterService {
 
   /**
    * Internal HTTP request wrapper with retry and timeout
-   * 
+   *
    * @param payload - Request payload
    * @returns Promise resolving to API response
    */
@@ -492,7 +492,7 @@ export class OpenRouterService {
 
   /**
    * Handles error responses from the API
-   * 
+   *
    * @param response - Fetch response object
    * @param attempt - Current retry attempt number
    * @throws Error if the error is not retryable
@@ -506,7 +506,7 @@ export class OpenRouterService {
     try {
       errorData = (await response.json()) as OpenRouterErrorResponse;
       errorMessage = errorData.error?.message || errorMessage;
-      
+
       // Log full error details for debugging
       console.error("OpenRouter API Error:", {
         status,
@@ -527,9 +527,7 @@ export class OpenRouterService {
     if (status === 429) {
       // Rate limit - retryable with backoff
       const retryAfter = response.headers.get("retry-after");
-      const backoffMs = retryAfter
-        ? parseInt(retryAfter, 10) * 1000
-        : this._calculateBackoff(attempt);
+      const backoffMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : this._calculateBackoff(attempt);
 
       this._logTelemetry("rate_limit_hit", {
         retry_after_ms: backoffMs,
@@ -554,7 +552,7 @@ export class OpenRouterService {
 
   /**
    * Maps local chat messages to OpenRouter format
-   * 
+   *
    * @param messages - Array of local chat messages
    * @returns Array of OpenRouter messages
    */
@@ -568,15 +566,12 @@ export class OpenRouterService {
 
   /**
    * Extracts model response from API response
-   * 
+   *
    * @param apiResponse - Raw API response
    * @param durationMs - Request duration in milliseconds
    * @returns Formatted model response
    */
-  private _extractModelResponse(
-    apiResponse: OpenRouterSuccessResponse,
-    durationMs: number
-  ): ModelResponse {
+  private _extractModelResponse(apiResponse: OpenRouterSuccessResponse, durationMs: number): ModelResponse {
     const choice = apiResponse.choices[0];
 
     if (!choice) {
@@ -599,7 +594,7 @@ export class OpenRouterService {
 
   /**
    * Sends a request with automatic retry on validation failure
-   * 
+   *
    * @param conversationId - Conversation identifier
    * @param payload - Request payload
    * @param responseFormat - Optional response format for validation
@@ -626,21 +621,13 @@ export class OpenRouterService {
 
         // Apply response format validation if specified
         if (responseFormat) {
-          const validationResult = responseValidator.validate(
-            modelResponse.content,
-            responseFormat
-          );
+          const validationResult = responseValidator.validate(modelResponse.content, responseFormat);
 
           if (!validationResult.valid) {
-            const errorMsg = validationResult.errors
-              ?.map((e) => `${e.path}: ${e.message}`)
-              .join("; ");
+            const errorMsg = validationResult.errors?.map((e) => `${e.path}: ${e.message}`).join("; ");
 
             // If strict mode or out of retries, throw
-            if (
-              responseFormat.json_schema.strict ||
-              attempt >= this._maxValidationRetries
-            ) {
+            if (responseFormat.json_schema.strict || attempt >= this._maxValidationRetries) {
               throw new Error(`Response validation failed: ${errorMsg}`);
             }
 
@@ -714,7 +701,7 @@ export class OpenRouterService {
 
   /**
    * Handles rate limit information from response headers
-   * 
+   *
    * @param headers - Response headers
    */
   private _handleRateLimitHeaders(headers: Headers): void {
@@ -731,7 +718,7 @@ export class OpenRouterService {
 
   /**
    * Checks if rate limit allows the request
-   * 
+   *
    * @throws Error if rate limit is exceeded
    */
   private async _checkRateLimit(): Promise<void> {
@@ -741,9 +728,7 @@ export class OpenRouterService {
     const windowMs = this._rateLimit.perSeconds * 1000;
 
     // Remove old timestamps outside the window
-    this._requestTimestamps = this._requestTimestamps.filter(
-      (timestamp) => now - timestamp < windowMs
-    );
+    this._requestTimestamps = this._requestTimestamps.filter((timestamp) => now - timestamp < windowMs);
 
     // Check if limit exceeded
     if (this._requestTimestamps.length >= this._rateLimit.requests) {
@@ -762,7 +747,7 @@ export class OpenRouterService {
 
   /**
    * Logs telemetry event
-   * 
+   *
    * @param event - Event name
    * @param data - Event data
    */
@@ -783,7 +768,7 @@ export class OpenRouterService {
 
   /**
    * Calculates exponential backoff delay
-   * 
+   *
    * @param attempt - Current retry attempt (0-indexed)
    * @returns Backoff delay in milliseconds
    */
@@ -796,7 +781,7 @@ export class OpenRouterService {
 
   /**
    * Sleep utility function
-   * 
+   *
    * @param ms - Milliseconds to sleep
    */
   private _sleep(ms: number): Promise<void> {
@@ -805,7 +790,7 @@ export class OpenRouterService {
 
   /**
    * Checks circuit breaker state before making a request
-   * 
+   *
    * @throws Error if circuit is open
    */
   private _checkCircuitBreaker(): void {
@@ -823,9 +808,7 @@ export class OpenRouterService {
         });
       } else {
         const waitMs = this._nextAttemptTime - now;
-        throw new Error(
-          `Circuit breaker is OPEN. Service unavailable. Retry in ${Math.ceil(waitMs / 1000)}s`
-        );
+        throw new Error(`Circuit breaker is OPEN. Service unavailable. Retry in ${Math.ceil(waitMs / 1000)}s`);
       }
     }
   }

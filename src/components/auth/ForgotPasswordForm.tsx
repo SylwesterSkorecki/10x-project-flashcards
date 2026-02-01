@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2, Mail } from "lucide-react";
 import { ForgotPasswordSchema } from "@/lib/schemas/auth.schema";
 import { cn } from "@/lib/utils";
+import { supabaseClient } from "@/db/supabase.client";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -22,8 +23,9 @@ export function ForgotPasswordForm() {
       ForgotPasswordSchema.parse({ email: value });
       setEmailError(null);
       return true;
-    } catch (error: any) {
-      setEmailError(error.errors[0]?.message || "Nieprawidłowy email");
+    } catch (err) {
+      const error = err as { errors?: Array<{ message: string }> };
+      setEmailError(error.errors?.[0]?.message || "Nieprawidłowy email");
       return false;
     }
   };
@@ -47,17 +49,18 @@ export function ForgotPasswordForm() {
     setLoading(true);
 
     try {
-      // TODO: Implement actual password reset logic with Supabase
-      // const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      //   redirectTo: `${window.location.origin}/auth/reset-password`
-      // });
-      
-      // if (error) throw error;
-      
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+      });
+
+      if (error) throw error;
+
+      // Always show success message (don't reveal if email exists or not)
       setSuccess(true);
-      console.log("Password reset requested for:", email);
-    } catch (error: any) {
-      setFormError("Wystąpił błąd. Spróbuj ponownie.");
+    } catch {
+      // For security, don't reveal if email exists
+      // Always show success message (even on error)
+      setSuccess(true);
     } finally {
       setLoading(false);
     }
@@ -73,12 +76,9 @@ export function ForgotPasswordForm() {
           <div className="space-y-2">
             <h2 className="text-2xl font-bold">Sprawdź swoją skrzynkę pocztową</h2>
             <p className="text-muted-foreground">
-              Jeśli konto o tym emailu istnieje, wysłaliśmy link do resetowania hasła na adres{" "}
-              <strong>{email}</strong>
+              Jeśli konto o tym emailu istnieje, wysłaliśmy link do resetowania hasła na adres <strong>{email}</strong>
             </p>
-            <p className="text-sm text-muted-foreground">
-              Link jest ważny przez 1 godzinę.
-            </p>
+            <p className="text-sm text-muted-foreground">Link jest ważny przez 1 godzinę.</p>
           </div>
           <div className="flex flex-col gap-2 mt-4">
             <Button asChild>
@@ -103,18 +103,12 @@ export function ForgotPasswordForm() {
     <div className="w-full max-w-md mx-auto p-6 space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Resetowanie hasła</h1>
-        <p className="text-muted-foreground">
-          Wpisz swój adres email, a wyślemy Ci link do ustawienia nowego hasła
-        </p>
+        <p className="text-muted-foreground">Wpisz swój adres email, a wyślemy Ci link do ustawienia nowego hasła</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && (
-          <div
-            id={formErrorId}
-            role="alert"
-            className="p-3 rounded-md bg-destructive/10 border border-destructive/20"
-          >
+          <div id={formErrorId} role="alert" className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
             <p className="text-sm text-destructive flex items-center gap-2">
               <AlertCircle className="size-4 flex-shrink-0" />
               {formError}
@@ -141,11 +135,7 @@ export function ForgotPasswordForm() {
             disabled={loading}
           />
           {emailError && (
-            <p
-              id={emailErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={emailErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {emailError}
             </p>

@@ -17,8 +17,4 @@ export { EditCandidateModal } from "./EditCandidateModal";
 export { CommitResultModal } from "./CommitResultModal";
 
 // Types
-export type {
-  EditedCandidateViewModel,
-  GenerateViewState,
-  GenerationStatus,
-} from "./types";
+export type { EditedCandidateViewModel, GenerateViewState, GenerationStatus } from "./types";

@@ -1,6 +1,6 @@
 /**
  * Generations Service - AI-powered flashcard generation
- * 
+ *
  * Handles the business logic for generating flashcard candidates from source text
  * using OpenRouter API integration.
  */
@@ -13,11 +13,7 @@ import {
   isFlashcardGenerationResponse,
   type FlashcardGenerationResponse,
 } from "../openrouter";
-import type {
-  CreateGenerationCommand,
-  CreateGenerationResponseSync,
-  GenerationCandidate,
-} from "../../types";
+import type { CreateGenerationCommand, CreateGenerationResponseSync, GenerationCandidate } from "../../types";
 import type { SupabaseClient } from "../../db/supabase.client";
 import { hashSourceText } from "../helpers/hash";
 
@@ -39,7 +35,7 @@ export class GenerationsService {
 
   /**
    * Creates a new GenerationsService instance
-   * 
+   *
    * @param supabase - Supabase client for database operations
    * @param config - Service configuration
    */
@@ -64,15 +60,12 @@ export class GenerationsService {
 
   /**
    * Generates flashcard candidates from source text using AI
-   * 
+   *
    * @param userId - ID of the user making the request
    * @param command - Generation command with source text and options
    * @returns Synchronous response with generated candidates
    */
-  async generateFlashcards(
-    userId: string,
-    command: CreateGenerationCommand
-  ): Promise<CreateGenerationResponseSync> {
+  async generateFlashcards(userId: string, command: CreateGenerationCommand): Promise<CreateGenerationResponseSync> {
     const { source_text, model, max_candidates = 8, timeout_seconds = 25 } = command;
 
     // Guard: Validate input
@@ -108,21 +101,17 @@ export class GenerationsService {
 
       // Call OpenRouter API
       const conversationId = `gen-${userId}-${Date.now()}`;
-      
+
       // TEMPORARY: Test without response_format to isolate the issue
       console.log("🔍 Sending request to OpenRouter...");
-      
-      const response = await this.openRouter.sendChatMessage(
-        conversationId,
-        [systemMessage, userMessage],
-        {
-          model: model || this.openRouter.defaultModel,
-          temperature: 0.2, // Low temperature for consistent, factual responses
-          max_tokens: 2000, // Sufficient for multiple flashcards
-          // TEMPORARY: Commented out to test if this is causing the error
-          // response_format: FLASHCARD_GENERATION_RESPONSE_FORMAT,
-        }
-      );
+
+      const response = await this.openRouter.sendChatMessage(conversationId, [systemMessage, userMessage], {
+        model: model || this.openRouter.defaultModel,
+        temperature: 0.2, // Low temperature for consistent, factual responses
+        max_tokens: 2000, // Sufficient for multiple flashcards
+        // TEMPORARY: Commented out to test if this is causing the error
+        // response_format: FLASHCARD_GENERATION_RESPONSE_FORMAT,
+      });
 
       // Calculate duration
       const durationMs = Date.now() - startTime;
@@ -131,10 +120,7 @@ export class GenerationsService {
       const parsedResponse = this._parseGenerationResponse(response.content);
 
       // Convert to GenerationCandidate format
-      const candidates = this._convertToGenerationCandidates(
-        parsedResponse.flashcards,
-        max_candidates
-      );
+      const candidates = this._convertToGenerationCandidates(parsedResponse.flashcards, max_candidates);
 
       // Store generation record in database
       const generationId = await this._storeGenerationRecord(
@@ -167,19 +153,13 @@ export class GenerationsService {
       // Re-throw with user-friendly message
       if (error instanceof Error) {
         if (error.message.includes("validation failed")) {
-          throw new Error(
-            "AI model returned invalid response format. Please try again."
-          );
+          throw new Error("AI model returned invalid response format. Please try again.");
         }
         if (error.message.includes("timeout")) {
-          throw new Error(
-            "Request timed out. Please try with shorter text or try again later."
-          );
+          throw new Error("Request timed out. Please try with shorter text or try again later.");
         }
         if (error.message.includes("Circuit breaker")) {
-          throw new Error(
-            "AI service is temporarily unavailable. Please try again in a few minutes."
-          );
+          throw new Error("AI service is temporarily unavailable. Please try again in a few minutes.");
         }
       }
 
@@ -189,7 +169,7 @@ export class GenerationsService {
 
   /**
    * Estimates the cost of generating flashcards (tokens and pricing)
-   * 
+   *
    * @param sourceText - Source text to analyze
    * @returns Estimated token count and cost
    */
@@ -226,7 +206,7 @@ export class GenerationsService {
 
   /**
    * Parses the AI response into FlashcardGenerationResponse
-   * 
+   *
    * @param content - Response content from AI
    * @returns Parsed flashcard generation response
    */
@@ -234,14 +214,14 @@ export class GenerationsService {
     try {
       // Clean up markdown formatting if present
       let cleanContent = content.trim();
-      
+
       // Remove markdown code blocks (```json ... ``` or ``` ... ```)
       const codeBlockRegex = /^```(?:json)?\s*\n?([\s\S]*?)\n?```$/;
       const match = cleanContent.match(codeBlockRegex);
       if (match) {
         cleanContent = match[1].trim();
       }
-      
+
       // Log cleaned content for debugging
       console.log("Parsing AI response:", {
         originalLength: content.length,
@@ -265,7 +245,7 @@ export class GenerationsService {
             delete card.answer;
           }
           // Add default score if missing
-          if (typeof card.score !== 'number') {
+          if (typeof card.score !== "number") {
             card.score = 0.8; // Default score
           }
           return card;
@@ -284,7 +264,7 @@ export class GenerationsService {
         error: error instanceof Error ? error.message : "Unknown error",
         contentPreview: content.substring(0, 200),
       });
-      
+
       throw new Error(
         `Failed to parse generation response: ${error instanceof Error ? error.message : "Unknown error"}`
       );
@@ -293,19 +273,19 @@ export class GenerationsService {
 
   /**
    * Converts AI response flashcards to GenerationCandidate format
-   * 
+   *
    * @param flashcards - Flashcards from AI response
    * @param maxCandidates - Maximum number of candidates to return
    * @returns Array of generation candidates
    */
   private _convertToGenerationCandidates(
-    flashcards: Array<{
+    flashcards: {
       front: string;
       back: string;
       score: number;
       difficulty?: string;
       tags?: string[];
-    }>,
+    }[],
     maxCandidates: number
   ): GenerationCandidate[] {
     // Sort by score (descending) and take top N
@@ -326,7 +306,7 @@ export class GenerationsService {
 
   /**
    * Stores generation record in database
-   * 
+   *
    * @param userId - User ID
    * @param sourceTextHash - Hash of source text
    * @param sourceTextLength - Length of source text
@@ -368,7 +348,7 @@ export class GenerationsService {
 
   /**
    * Logs generation error to database
-   * 
+   *
    * @param userId - User ID
    * @param sourceTextHash - Hash of source text
    * @param sourceTextLength - Length of source text

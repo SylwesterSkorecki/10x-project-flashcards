@@ -1,6 +1,6 @@
 /**
  * System message templates for OpenRouter conversations
- * 
+ *
  * These templates define the behavior and constraints for the AI model
  * to ensure consistent, reliable responses that match expected formats.
  */
@@ -35,7 +35,7 @@ export const FLASHCARD_GENERATION_SYSTEM_MESSAGE: ChatMessage = {
     "- Include a 'score' field (0.0-1.0) indicating flashcard quality\n" +
     "- Avoid overly complex or compound questions\n" +
     "- Focus on key concepts and actionable knowledge\n" +
-    "- Return ONLY valid JSON with this structure: {\"flashcards\": [{\"front\": \"...\", \"back\": \"...\", \"score\": 0.9}]}\n" +
+    '- Return ONLY valid JSON with this structure: {"flashcards": [{"front": "...", "back": "...", "score": 0.9}]}\n' +
     "- Never include markdown formatting, explanations, or text outside the JSON object",
 };
 
@@ -71,7 +71,7 @@ export const RETRY_VALIDATION_SYSTEM_MESSAGE: ChatMessage = {
 
 /**
  * Creates a combined system message from multiple templates
- * 
+ *
  * @param templates - Array of system message templates to combine
  * @returns Combined system message
  */
@@ -89,7 +89,7 @@ export function combineSystemMessages(...templates: ChatMessage[]): ChatMessage 
 
 /**
  * Creates a user message for flashcard generation
- * 
+ *
  * @param sourceText - Source text to generate flashcards from
  * @param options - Optional configuration
  * @returns User message for flashcard generation

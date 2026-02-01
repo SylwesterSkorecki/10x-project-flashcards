@@ -41,12 +41,12 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
       //   email: userEmail,
       //   password: deletePassword
       // });
-      
+
       // if (authError) {
       //   setDeleteError("Nieprawidłowe hasło");
       //   return;
       // }
-      
+
       // 2. Call DELETE /api/account endpoint
       // const response = await fetch('/api/account', {
       //   method: 'DELETE',
@@ -54,15 +54,15 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
       //     'Authorization': `Bearer ${token}`
       //   }
       // });
-      
+
       // if (!response.ok) {
       //   throw new Error('Failed to delete account');
       // }
-      
+
       // 3. Sign out and redirect
       // await supabaseClient.auth.signOut();
       // window.location.href = '/auth/login?message=account_deleted';
-      
+
       console.log("Account deletion requested");
     } catch (error: any) {
       setDeleteError("Wystąpił błąd podczas usuwania konta. Spróbuj ponownie.");
@@ -84,23 +84,19 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
     <div className="w-full max-w-2xl mx-auto p-6 space-y-8">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Ustawienia konta</h1>
-        <p className="text-muted-foreground">
-          Zarządzaj swoim kontem i danymi osobowymi
-        </p>
+        <p className="text-muted-foreground">Zarządzaj swoim kontem i danymi osobowymi</p>
       </div>
 
       <div className="space-y-6">
         {/* Account Information */}
         <div className="border rounded-lg p-6 space-y-4">
           <h2 className="text-xl font-semibold">Informacje o koncie</h2>
-          
+
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Email</Label>
               <Input value={userEmail} disabled className="bg-muted" />
-              <p className="text-xs text-muted-foreground">
-                Twój adres email nie może być zmieniony
-              </p>
+              <p className="text-xs text-muted-foreground">Twój adres email nie może być zmieniony</p>
             </div>
 
             {createdAt && (
@@ -115,9 +111,7 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
         {/* Change Password */}
         <div className="border rounded-lg p-6 space-y-4">
           <h2 className="text-xl font-semibold">Zmiana hasła</h2>
-          <p className="text-sm text-muted-foreground">
-            Aby zmienić hasło, skorzystaj z opcji resetowania hasła
-          </p>
+          <p className="text-sm text-muted-foreground">Aby zmienić hasło, skorzystaj z opcji resetowania hasła</p>
           <Button variant="outline" asChild>
             <a href="/auth/forgot-password">Zresetuj hasło</a>
           </Button>
@@ -131,13 +125,9 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
               Działania w tej sekcji są nieodwracalne. Postępuj ostrożnie.
             </p>
           </div>
-          
+
           <div className="pt-2">
-            <Button
-              variant="destructive"
-              onClick={() => setShowDeleteModal(true)}
-              className="gap-2"
-            >
+            <Button variant="destructive" onClick={() => setShowDeleteModal(true)} className="gap-2">
               <Trash2 className="size-4" />
               Usuń konto
             </Button>
@@ -146,13 +136,16 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={showDeleteModal} onOpenChange={(open) => {
-        if (!open) {
-          setShowDeleteModal(false);
-          setDeletePassword("");
-          setDeleteError(null);
-        }
-      }}>
+      <Dialog
+        open={showDeleteModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowDeleteModal(false);
+            setDeletePassword("");
+            setDeleteError(null);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
@@ -161,8 +154,7 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
             </DialogTitle>
             <DialogDescription className="space-y-2 pt-2">
               <p>
-                <strong>Ta operacja jest nieodwracalna.</strong> Wszystkie Twoje fiszki i dane
-                zostaną trwale usunięte.
+                <strong>Ta operacja jest nieodwracalna.</strong> Wszystkie Twoje fiszki i dane zostaną trwale usunięte.
               </p>
               <p>Czy na pewno chcesz kontynuować?</p>
             </DialogDescription>
@@ -170,10 +162,7 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
 
           <div className="py-4 space-y-4">
             {deleteError && (
-              <div
-                role="alert"
-                className="p-3 rounded-md bg-destructive/10 border border-destructive/20"
-              >
+              <div role="alert" className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
                 <p className="text-sm text-destructive flex items-center gap-2">
                   <AlertCircle className="size-4 flex-shrink-0" />
                   {deleteError}
@@ -215,11 +204,7 @@ export function AccountSettings({ userEmail, createdAt }: AccountSettingsProps) 
             >
               Anuluj
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteAccount}
-              disabled={deleting || !deletePassword}
-            >
+            <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleting || !deletePassword}>
               {deleting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />

@@ -22,21 +22,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     error: authError,
   } = await supabase.auth.getUser();
 
-  // TEMPORARY: For testing without auth, create a test user ID
-  // TODO: Remove this when auth is implemented
-  const TEST_MODE = true;
-  const TEST_USER_ID = "00000000-0000-0000-0000-000000000001";
-
-  let userId: string;
-  
-  if (TEST_MODE && (!user || authError)) {
-    console.warn("⚠️ TEST MODE: Using test user ID");
-    userId = TEST_USER_ID;
-  } else if (authError || !user) {
-    return createErrorResponse("unauthorized", "Authentication required", 401);
-  } else {
-    userId = user.id;
+  // Require authentication - no test mode bypass
+  if (authError || !user) {
+    return createErrorResponse("unauthorized", "Wymagana autoryzacja", 401);
   }
+
+  const userId = user.id;
 
   try {
     // Parse and validate request body
@@ -51,21 +42,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Guard: Validate length constraints
     if (sourceTextLength < 1000 || sourceTextLength > 10000) {
-      return createErrorResponse(
-        "validation_error",
-        "source_text must be between 1000 and 10000 characters",
-        400
-      );
+      return createErrorResponse("validation_error", "source_text must be between 1000 and 10000 characters", 400);
     }
 
     // Guard: Validate max_candidates if provided
     if (body.max_candidates !== undefined) {
       if (body.max_candidates < 1 || body.max_candidates > 20) {
-        return createErrorResponse(
-          "validation_error",
-          "max_candidates must be between 1 and 20",
-          400
-        );
+        return createErrorResponse("validation_error", "max_candidates must be between 1 and 20", 400);
       }
     }
 
@@ -73,11 +56,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const openRouterApiKey = import.meta.env.OPENROUTER_API_KEY;
     if (!openRouterApiKey) {
       console.error("OPENROUTER_API_KEY not configured");
-      return createErrorResponse(
-        "internal_error",
-        "AI service not configured. Please contact support.",
-        500
-      );
+      return createErrorResponse("internal_error", "AI service not configured. Please contact support.", 500);
     }
 
     // Initialize GenerationsService
@@ -108,10 +87,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Handle known errors with appropriate messages
     if (error instanceof Error) {
       // User-friendly errors from service
-      if (
-        error.message.includes("must be between") ||
-        error.message.includes("cannot be empty")
-      ) {
+      if (error.message.includes("must be between") || error.message.includes("cannot be empty")) {
         return createErrorResponse("validation_error", error.message, 400);
       }
 
@@ -126,11 +102,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
 
       // Generic internal error with user-friendly message
-      return createErrorResponse(
-        "internal_error",
-        "Failed to generate flashcards. Please try again.",
-        500
-      );
+      return createErrorResponse("internal_error", "Failed to generate flashcards. Please try again.", 500);
     }
 
     // Unknown error
@@ -143,9 +115,5 @@ export const POST: APIRoute = async ({ request, locals }) => {
  * Not implemented - generations use synchronous POST responses
  */
 export const GET: APIRoute = async () => {
-  return createErrorResponse(
-    "not_implemented",
-    "GET endpoint not implemented. Use POST to generate flashcards.",
-    501
-  );
+  return createErrorResponse("not_implemented", "GET endpoint not implemented. Use POST to generate flashcards.", 501);
 };

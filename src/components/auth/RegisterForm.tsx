@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
 import { RegisterSchema } from "@/lib/schemas/auth.schema";
 import { cn } from "@/lib/utils";
+import { supabaseClient } from "@/db/supabase.client";
 
 export function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -36,10 +37,10 @@ export function RegisterForm() {
       error.errors?.forEach((err: any) => {
         const field = err.path[0];
         const message = err.message;
-        
-        if (field === 'email') setEmailError(message);
-        if (field === 'password') setPasswordError(message);
-        if (field === 'confirmPassword') setConfirmPasswordError(message);
+
+        if (field === "email") setEmailError(message);
+        if (field === "password") setPasswordError(message);
+        if (field === "confirmPassword") setConfirmPasswordError(message);
       });
       return false;
     }
@@ -56,26 +57,33 @@ export function RegisterForm() {
     setLoading(true);
 
     try {
-      // TODO: Implement actual registration logic with Supabase
-      // const { data, error } = await supabaseClient.auth.signUp({
-      //   email,
-      //   password,
-      //   options: {
-      //     emailRedirectTo: `${window.location.origin}/auth/verify-email`
-      //   }
-      // });
-      
-      // if (error) throw error;
-      
-      setSuccess(true);
-      console.log("Registration submitted:", { email });
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?type=signup`,
+        },
+      });
+
+      if (error) throw error;
+
+      // Check if email confirmation is required
+      if (data.user && !data.user.confirmed_at) {
+        // Email confirmation required - show success message
+        setSuccess(true);
+      } else {
+        // Auto-confirmed (local dev) - redirect to login
+        window.location.href = "/auth/login?message=email_verified";
+      }
     } catch (error: any) {
-      const message = error.message?.toLowerCase() || '';
-      
-      if (message.includes('user already registered')) {
-        setFormError("Ten email jest już zarejestrowany");
-      } else if (message.includes('password')) {
+      const message = error.message?.toLowerCase() || "";
+
+      if (message.includes("user already registered") || message.includes("already been registered")) {
+        setFormError("Ten email jest już zarejestrowany. Spróbuj się zalogować.");
+      } else if (message.includes("password") && message.includes("characters")) {
         setFormError("Hasło musi mieć co najmniej 10 znaków");
+      } else if (message.includes("invalid")) {
+        setFormError("Nieprawidłowy format emaila lub hasła");
       } else {
         setFormError("Wystąpił błąd podczas rejestracji. Spróbuj ponownie.");
       }
@@ -112,18 +120,12 @@ export function RegisterForm() {
     <div className="w-full max-w-md mx-auto p-6 space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Utwórz konto</h1>
-        <p className="text-muted-foreground">
-          Wypełnij formularz aby rozpocząć naukę
-        </p>
+        <p className="text-muted-foreground">Wypełnij formularz aby rozpocząć naukę</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && (
-          <div
-            id={formErrorId}
-            role="alert"
-            className="p-3 rounded-md bg-destructive/10 border border-destructive/20"
-          >
+          <div id={formErrorId} role="alert" className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
             <p className="text-sm text-destructive flex items-center gap-2">
               <AlertCircle className="size-4 flex-shrink-0" />
               {formError}
@@ -153,11 +155,7 @@ export function RegisterForm() {
             disabled={loading}
           />
           {emailError && (
-            <p
-              id={emailErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={emailErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {emailError}
             </p>
@@ -186,11 +184,7 @@ export function RegisterForm() {
             disabled={loading}
           />
           {passwordError && (
-            <p
-              id={passwordErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={passwordErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {passwordError}
             </p>
@@ -222,11 +216,7 @@ export function RegisterForm() {
             disabled={loading}
           />
           {confirmPasswordError && (
-            <p
-              id={confirmPasswordErrorId}
-              role="alert"
-              className="text-sm text-destructive flex items-center gap-1"
-            >
+            <p id={confirmPasswordErrorId} role="alert" className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="size-3" />
               {confirmPasswordError}
             </p>

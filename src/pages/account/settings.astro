@@ -6,7 +6,7 @@ import { AccountSettings } from "@/components/account/AccountSettings";
 // TODO: Implement auth guard
 // const supabase = Astro.locals.supabase;
 // const { data: { user }, error } = await supabase.auth.getUser();
-// 
+//
 // if (!user || error) {
 //   const returnTo = encodeURIComponent("/account/settings");
 //   return Astro.redirect(`/auth/login?returnTo=${returnTo}`);
@@ -26,7 +26,7 @@ const isAuthenticated = true;
 
 <Layout title="Ustawienia konta - SmartFlash">
   <Navigation client:load isAuthenticated={isAuthenticated} userEmail={userEmail} />
-  
+
   <div class="min-h-screen bg-muted/30 py-12 px-4">
     <AccountSettings client:load userEmail={userEmail} createdAt={createdAt} />
   </div>

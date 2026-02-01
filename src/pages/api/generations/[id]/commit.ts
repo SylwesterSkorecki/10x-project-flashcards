@@ -1,102 +1,64 @@
 import type { APIRoute } from "astro";
 import type { CommitGenerationCommand, BulkSaveResult } from "@/types";
-import { supabaseClient } from "@/db/supabase.client";
 import type { TablesInsert } from "@/db/database.types";
+import { createErrorResponse } from "@/lib/helpers/api-error";
 
 export const prerender = false;
 
-// TEMPORARY: Hardcoded test user ID for development
-// TODO: Replace with real authentication when implemented
-const TEST_USER_ID = "00000000-0000-0000-0000-000000000001";
-
-export const POST: APIRoute = async ({ params, request }) => {
+export const POST: APIRoute = async ({ params, request, locals }) => {
   try {
-    const generationId = params.id;
-    
-    if (!generationId) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "validation_error",
-            message: "generation_id is required",
-          },
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+    // Step 1: Verify authentication
+    const supabase = locals.supabase;
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return createErrorResponse("unauthorized", "Wymagana autoryzacja", 401);
     }
 
-    // Parse request body
-    const body = await request.json() as CommitGenerationCommand;
-    
+    const userId = user.id;
+
+    // Step 2: Validate generation ID
+    const generationId = params.id;
+
+    if (!generationId) {
+      return createErrorResponse("validation_error", "ID generacji jest wymagane", 400);
+    }
+
+    // Step 3: Parse and validate request body
+    const body = (await request.json()) as CommitGenerationCommand;
+
+    // Step 4: Validate request body
     if (!body.accepted || !Array.isArray(body.accepted)) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "validation_error",
-            message: "accepted array is required",
-          },
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return createErrorResponse("validation_error", "Tablica zaakceptowanych kandydatów jest wymagana", 400);
     }
 
     if (body.accepted.length === 0) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "validation_error",
-            message: "At least one candidate must be accepted",
-          },
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return createErrorResponse("validation_error", "Musisz zaakceptować przynajmniej jednego kandydata", 400);
     }
 
-    // Initialize Supabase client
-    const supabase = supabaseClient;
-
-    // Verify that generation exists and belongs to test user
+    // Step 5: Verify that generation exists and belongs to current user
     const { data: generation, error: generationError } = await supabase
       .from("generations")
       .select("id, user_id")
       .eq("id", generationId)
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", userId)
       .single();
 
     if (generationError || !generation) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "not_found",
-            message: "Generation not found",
-          },
-        }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return createErrorResponse("not_found", "Generacja nie została znaleziona", 404);
     }
 
-    // Prepare flashcards for bulk insert
-    const flashcardsToInsert: TablesInsert<"flashcards">[] = body.accepted.map(
-      (candidate) => ({
-        user_id: TEST_USER_ID,
-        generation_id: generationId,
-        front: candidate.front,
-        back: candidate.back,
-        source: candidate.source,
-      })
-    );
+    // Step 6: Prepare flashcards for bulk insert with current user
+    const flashcardsToInsert: TablesInsert<"flashcards">[] = body.accepted.map((candidate) => ({
+      user_id: userId,
+      generation_id: generationId,
+      front: candidate.front,
+      back: candidate.back,
+      source: candidate.source,
+    }));
 
     const saved: BulkSaveResult["saved"] = [];
     const skipped: BulkSaveResult["skipped"] = [];
@@ -105,11 +67,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     // Note: Bulk insert with .insert() doesn't provide granular error handling
     // for unique constraint violations, so we process individually
     for (const flashcard of flashcardsToInsert) {
-      const { data, error } = await supabase
-        .from("flashcards")
-        .insert(flashcard)
-        .select("id, front")
-        .single();
+      const { data, error } = await supabase.from("flashcards").insert(flashcard).select("id, front").single();
 
       if (error) {
         // Check if error is due to duplicate front (unique constraint)
@@ -160,17 +118,6 @@ export const POST: APIRoute = async ({ params, request }) => {
     });
   } catch (error) {
     console.error("Commit API error:", error);
-    return new Response(
-      JSON.stringify({
-        error: {
-          code: "internal_error",
-          message: "Failed to commit candidates",
-        },
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return createErrorResponse("internal_error", "Wystąpił błąd podczas zapisywania fiszek. Spróbuj ponownie.", 500);
   }
 };

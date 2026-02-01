@@ -1,6 +1,6 @@
 /**
  * Response Validator for OpenRouter API responses
- * 
+ *
  * Provides JSON Schema validation using ajv library with support for:
  * - Strict mode validation
  * - Custom error formatting
@@ -40,18 +40,14 @@ export class ResponseValidator {
 
   /**
    * Validates a response against a JSON Schema
-   * 
+   *
    * @param content - Response content (string or parsed object)
    * @param responseFormat - Response format configuration with schema
    * @returns Validation result with parsed data or errors
    */
   validate(content: string | unknown, responseFormat: ResponseFormat): ValidationResult {
     // Guard: Check if response format is valid
-    if (
-      !responseFormat ||
-      responseFormat.type !== "json_schema" ||
-      !responseFormat.json_schema
-    ) {
+    if (!responseFormat || responseFormat.type !== "json_schema" || !responseFormat.json_schema) {
       return {
         valid: false,
         errors: [
@@ -116,7 +112,7 @@ export class ResponseValidator {
 
   /**
    * Validates a response and throws on failure (strict mode)
-   * 
+   *
    * @param content - Response content to validate
    * @param responseFormat - Response format configuration
    * @returns Parsed and validated data
@@ -135,7 +131,7 @@ export class ResponseValidator {
 
   /**
    * Checks if content is valid JSON without full schema validation
-   * 
+   *
    * @param content - Content to check
    * @returns True if valid JSON, false otherwise
    */
@@ -162,7 +158,7 @@ export class ResponseValidator {
 
   /**
    * Gets or compiles a validator for a schema
-   * 
+   *
    * @param name - Schema name (for caching)
    * @param schema - JSON Schema object
    * @returns Compiled validator function
@@ -184,13 +180,11 @@ export class ResponseValidator {
 
   /**
    * Formats ajv errors into a more user-friendly format
-   * 
+   *
    * @param errors - Array of ajv error objects
    * @returns Formatted error array
    */
-  private _formatErrors(
-    errors: ErrorObject[]
-  ): Array<{ path: string; message: string }> {
+  private _formatErrors(errors: ErrorObject[]): { path: string; message: string }[] {
     return errors.map((error) => {
       const path = error.instancePath || error.schemaPath || "root";
       let message = error.message || "Validation error";
@@ -237,7 +231,7 @@ export class ResponseValidator {
 
   /**
    * Attempts to repair common issues in responses (non-strict mode only)
-   * 
+   *
    * @param data - Data to repair
    * @param schema - Expected schema
    * @param errors - Validation errors
@@ -246,7 +240,7 @@ export class ResponseValidator {
   private _attemptRepair(
     data: unknown,
     schema: Record<string, unknown>,
-    errors: Array<{ path: string; message: string }>
+    errors: { path: string; message: string }[]
   ): { success: boolean; data?: unknown } {
     // Guard: Only repair objects
     if (typeof data !== "object" || data === null) {
@@ -299,7 +293,7 @@ export class ResponseValidator {
 
   /**
    * Gets a default value for a given JSON Schema type
-   * 
+   *
    * @param type - JSON Schema type
    * @returns Default value or undefined
    */

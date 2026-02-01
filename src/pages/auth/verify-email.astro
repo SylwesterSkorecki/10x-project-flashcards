@@ -3,22 +3,40 @@ import Layout from "@/layouts/Layout.astro";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
-// TODO: Implement email verification logic
-// const supabase = Astro.locals.supabase;
-// const { data: { user }, error } = await supabase.auth.getUser();
+// Email verification is handled automatically by Supabase when user clicks the link
+// The link contains a token that Supabase processes on the backend
+// After clicking the link, user is redirected here with a session or error
 
-// Mock status for UI demonstration
+const supabase = Astro.locals.supabase;
+const { data: { user }, error } = await supabase.auth.getUser();
+
 let status: "success" | "error" | "already_verified" = "success";
 let message = "Twój email został zweryfikowany! Możesz się teraz zalogować.";
 
-// TODO: Uncomment when Supabase is integrated
-// if (error) {
-//   status = 'error';
-//   message = 'Link weryfikacyjny jest nieprawidłowy lub wygasł.';
-// } else if (user?.email_confirmed_at) {
-//   status = 'already_verified';
-//   message = 'Twój email został już wcześniej zweryfikowany.';
-// }
+if (error || !user) {
+  // No valid session - either token expired or invalid
+  status = "error";
+  message = "Link weryfikacyjny jest nieprawidłowy lub wygasł. Zarejestruj się ponownie.";
+} else if (user.email_confirmed_at) {
+  // User has confirmed email - check if it was just confirmed or already confirmed before
+  const confirmedDate = new Date(user.email_confirmed_at);
+  const now = new Date();
+  const diffMinutes = (now.getTime() - confirmedDate.getTime()) / (1000 * 60);
+  
+  if (diffMinutes < 5) {
+    // Just confirmed (less than 5 minutes ago)
+    status = "success";
+    message = "Twój email został zweryfikowany! Możesz się teraz zalogować.";
+  } else {
+    // Already verified before
+    status = "already_verified";
+    message = "Twój email został już wcześniej zweryfikowany. Możesz się zalogować.";
+  }
+} else {
+  // Edge case: user exists but email not confirmed yet
+  status = "error";
+  message = "Email nie został jeszcze zweryfikowany. Sprawdź swoją skrzynkę pocztową.";
+}
 
 const redirectUrl =
   status === "success"

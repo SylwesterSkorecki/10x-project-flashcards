@@ -2,18 +2,12 @@
 import Layout from "@/layouts/Layout.astro";
 import { GeneratePage } from "@/components/generate";
 
-// Auth guard - check if user is authenticated
-// TODO: Uncomment when auth/login page is implemented
-// const supabase = Astro.locals.supabase;
-// const {
-//   data: { user },
-// } = await supabase.auth.getUser();
+// Auth guard is handled by middleware - this page is protected by default
+// If user is not authenticated, middleware will redirect to /auth/login
+const user = Astro.locals.user;
 
-// if (!user) {
-//   // Redirect to login with returnTo parameter
-//   const returnTo = encodeURIComponent("/generate");
-//   return Astro.redirect(`/auth/login?returnTo=${returnTo}`);
-// }
+// User is guaranteed to be authenticated here (middleware handles redirect)
+// Pass user to component if needed
 ---
 
 <Layout title="Generate Flashcards">

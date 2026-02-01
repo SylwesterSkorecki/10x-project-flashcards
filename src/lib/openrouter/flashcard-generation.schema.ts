@@ -1,6 +1,6 @@
 /**
  * JSON Schema definitions for flashcard generation with OpenRouter
- * 
+ *
  * These schemas define the expected structure of responses from the AI model
  * when generating flashcards from source text.
  */
@@ -134,9 +134,7 @@ export interface FlashcardGenerationResponse {
  * Validates if a parsed response matches the expected structure
  * This is a runtime type guard
  */
-export function isFlashcardGenerationResponse(
-  data: unknown
-): data is FlashcardGenerationResponse {
+export function isFlashcardGenerationResponse(data: unknown): data is FlashcardGenerationResponse {
   if (typeof data !== "object" || data === null) {
     return false;
   }

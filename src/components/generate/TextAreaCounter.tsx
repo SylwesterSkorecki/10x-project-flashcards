@@ -40,7 +40,7 @@ export function TextAreaCounter({
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const pastedText = e.clipboardData.getData("text");
     const newValue = value + pastedText;
-    
+
     // If paste would exceed maxLength, truncate
     if (newValue.length > maxLength) {
       e.preventDefault();
@@ -87,7 +87,7 @@ export function TextAreaCounter({
             isValid && "border-green-500 focus:ring-green-500"
           )}
         />
-        
+
         {/* Counter badge */}
         <div
           id={counterId}

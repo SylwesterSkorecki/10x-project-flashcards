@@ -18,12 +18,7 @@ interface CommitResultModalProps {
   onRetrySkipped?: () => void;
 }
 
-export function CommitResultModal({
-  result,
-  isOpen,
-  onClose,
-  onRetrySkipped,
-}: CommitResultModalProps) {
+export function CommitResultModal({ result, isOpen, onClose, onRetrySkipped }: CommitResultModalProps) {
   if (!result) return null;
 
   const { saved, skipped } = result;
@@ -70,16 +65,11 @@ export function CommitResultModal({
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="size-4 text-green-500" />
-                <h3 className="font-semibold text-sm">
-                  Saved ({saved.length})
-                </h3>
+                <h3 className="font-semibold text-sm">Saved ({saved.length})</h3>
               </div>
               <div className="space-y-2">
                 {saved.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-3 rounded-md bg-green-500/5 border border-green-500/20"
-                  >
+                  <div key={item.id} className="p-3 rounded-md bg-green-500/5 border border-green-500/20">
                     <p className="text-sm leading-relaxed">{item.front}</p>
                   </div>
                 ))}
@@ -92,19 +82,12 @@ export function CommitResultModal({
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <XCircle className="size-4 text-destructive" />
-                <h3 className="font-semibold text-sm">
-                  Skipped ({skipped.length})
-                </h3>
+                <h3 className="font-semibold text-sm">Skipped ({skipped.length})</h3>
               </div>
               <div className="space-y-2">
                 {skipped.map((item, index) => (
-                  <div
-                    key={index}
-                    className="p-3 rounded-md bg-destructive/5 border border-destructive/20 space-y-1"
-                  >
-                    <p className="text-sm leading-relaxed font-medium">
-                      {item.front}
-                    </p>
+                  <div key={index} className="p-3 rounded-md bg-destructive/5 border border-destructive/20 space-y-1">
+                    <p className="text-sm leading-relaxed font-medium">{item.front}</p>
                     <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
                       <AlertTriangle className="size-3 mt-0.5 flex-shrink-0" />
                       <span>{item.reason}</span>
@@ -122,9 +105,7 @@ export function CommitResultModal({
               Review Skipped
             </Button>
           )}
-          <Button onClick={onClose}>
-            {hasSaved ? "Done" : "Close"}
-          </Button>
+          <Button onClick={onClose}>{hasSaved ? "Done" : "Close"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

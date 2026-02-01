@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LogOut, Settings, FileText, Loader2 } from "lucide-react";
+import { supabaseClient } from "@/db/supabase.client";
 
 interface NavigationProps {
   isAuthenticated: boolean;
@@ -15,13 +16,20 @@ export function Navigation({ isAuthenticated, userEmail }: NavigationProps) {
     setLoggingOut(true);
 
     try {
-      // TODO: Implement actual logout logic with Supabase
-      // await supabaseClient.auth.signOut();
-      // window.location.href = '/auth/login?message=logged_out';
-      
-      console.log("Logout initiated");
+      // Sign out from Supabase
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        console.error("Logout error:", error);
+        throw error;
+      }
+
+      // Redirect to login page with success message
+      window.location.href = "/auth/login?message=logged_out";
     } catch (error) {
       console.error("Logout failed:", error);
+      // Even if there's an error, redirect to login (session might be invalid)
+      window.location.href = "/auth/login";
     } finally {
       setLoggingOut(false);
     }
@@ -53,34 +61,25 @@ export function Navigation({ isAuthenticated, userEmail }: NavigationProps) {
         <a href="/" className="text-xl font-bold">
           SmartFlash
         </a>
-        
+
         <div className="flex items-center gap-4">
           <Button variant="ghost" asChild className="hidden sm:flex">
             <a href="/generate">Generuj fiszki</a>
           </Button>
-          
+
           <div className="relative">
-            <Button
-              variant="outline"
-              onClick={() => setShowMenu(!showMenu)}
-              className="gap-2"
-            >
+            <Button variant="outline" onClick={() => setShowMenu(!showMenu)} className="gap-2">
               <span className="hidden sm:inline">{userEmail}</span>
               <span className="sm:hidden">Menu</span>
             </Button>
 
             {showMenu && (
               <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowMenu(false)}
-                />
+                <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
                 <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-popover border z-50">
                   <div className="py-1" role="menu">
-                    <div className="px-4 py-2 text-sm text-muted-foreground border-b">
-                      {userEmail}
-                    </div>
-                    
+                    <div className="px-4 py-2 text-sm text-muted-foreground border-b">{userEmail}</div>
+
                     <a
                       href="/generate"
                       className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent"
@@ -89,7 +88,7 @@ export function Navigation({ isAuthenticated, userEmail }: NavigationProps) {
                       <FileText className="size-4" />
                       Generuj fiszki
                     </a>
-                    
+
                     <a
                       href="/account/settings"
                       className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent"
@@ -98,9 +97,9 @@ export function Navigation({ isAuthenticated, userEmail }: NavigationProps) {
                       <Settings className="size-4" />
                       Ustawienia konta
                     </a>
-                    
+
                     <div className="border-t my-1" />
-                    
+
                     <button
                       onClick={handleLogout}
                       disabled={loggingOut}
